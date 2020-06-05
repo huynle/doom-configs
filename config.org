@@ -1,0 +1,179 @@
+#+TITLE: My emacs doom configuration
+#+AUTHOR: Huy Le
+#+EMAIL: dacrazyazn.com
+#+LANGUAGE: en
+#+STARTUP: inlineimages
+#+PROPERTY: header-args :tangle yes :cache yes :results silent :padline no
+
+
+* Table of Contents :TOC_3_gh:
+- [[#original-repo][Original Repo]]
+  - [[#personal-notes][Personal notes]]
+  - [[#resources][Resources]]
+    - [[#nmartin84-github--good-for-literate-programming][nmartin84 Github :: good for literate programming]]
+    - [[#literate-doom-emacs-config--blog-post-using-org-literate-programming][Literate doom emacs config :: blog post using org literate programming]]
+- [[#configuration][Configuration]]
+  - [[#personal-information][Personal Information]]
+    - [[#set-full-name][Set full name]]
+    - [[#set-email-address][Set email address]]
+  - [[#doom-core][Doom core]]
+    - [[#core][Core]]
+    - [[#keybinds][Keybinds]]
+    - [[#os][Os]]
+    - [[#scratch][Scratch]]
+    - [[#ui][Ui]]
+  - [[#doom-modules][Doom modules]]
+
+* [[https://github.com/Brettm12345/doom-emacs-literate-config][Original Repo]]
+To get more configurations get it from here. This is really good, allows me to annotate all my changes to the default DOOM configuration
+
+** Personal notes
+Things to keep in mind
++ run ~.emacs.d/bin/doom sync~ to get things rebuilt
+  + would ~M-x doom/reload~ work? have yet to try
+
+** Resources
+*** [[https://github.com/nmartin84/.doom.d][nmartin84 Github]] :: good for literate programming
+*** TODO [[https://dotdoom.rgoswami.me/config.html][Literate doom emacs config]] :: blog post using org literate programming
+  Really good resource, start checking out localleader stuff here
+
+* Configuration
+** Personal Information
+*** Set full name
+#+BEGIN_SRC emacs-lisp
+(setq user-full-name "Huy Le")
+#+END_SRC
+*** Set email address
+#+BEGIN_SRC emacs-lisp
+(setq user-mail-address "dacrazyazn.com")
+#+END_SRC
+** Doom core
+
+Here I setup my config for the =doom-emacs= [[doom:core/][core]]
+*** [[doom:core/core.el][Core]]
+**** Do not create lockfiles for files being edited
+#+BEGIN_SRC emacs-lisp
+(setq create-lockfiles nil)
+#+END_SRC
+*** [[doom:core/core-keybinds.el][Keybinds]]
+Here I set my keybinds these are applied on top of the [[doom-modules:config/default/+emacs-bindings.el][defaults]]
+**** Global keybinds
+**** DONE Localleader
++ Default ~localleader~ is ~SPC-m~
++ see if we can get this updated to ~;~
+
+#+BEGIN_SRC emacs-lisp
+;; (setq doom-localleader-key ";")
+#+END_SRC
+**** Leader keybinds
+#+BEGIN_SRC emacs-lisp
+(map! :leader
+      (:prefix "TAB"
+        :desc "Rename workspace"       "r"  #'+workspace/rename)
+      (:prefix "f"
+        :desc "Find remote file"      "R" #'counsel-tramp
+        :desc "Find file in dotfiles" "t" #'+brett/find-in-dotfiles
+        :desc "Browse dotfiles"       "T" #'+brett/browse-dotfiles)
+      (:prefix "n"
+        :desc "Browse mode notes"    "m" #'+brett/find-notes-for-major-mode
+        :desc "Browse project notes" "p" #'+brett/find-notes-for-project)
+      (:prefix "t"
+        :desc "Rainbow mode" "r" #'rainbow-mode)
+      (:prefix "/"
+        :desc "Hex colors" "h"  #'counsel-hex-colors))
+#+END_SRC
+**** Use ~] SPC~ and ~[ SPC~ to insert newlines above and below
+ Similar to [[github:tpope/vim-unimpaired][vim-unimpaired]]
+#+BEGIN_SRC emacs-lisp
+(map!
+ (:after evil
+   :m  "] SPC" #'evil-motion-insert-newline-below
+   :m  "[ SPC" #'evil-motion-insert-newline-above))
+#+END_SRC
+**** Easy window navigation
+#+BEGIN_SRC emacs-lisp
+(map!
+ (:after evil
+   :en "C-h"   #'evil-window-left
+   :en "C-j"   #'evil-window-down
+   :en "C-k"   #'evil-window-up
+   :en "C-l"   #'evil-window-right))
+#+END_SRC
+**** Org Mode
+#+BEGIN_SRC emacs-lisp
+;; (map! (:localleader
+;;         (:after evil-org
+;;           :map evil-org-mode-map
+;;           "/" #'counsel-org-goto)))
+#+END_SRC
+**** Dired
+#+BEGIN_SRC emacs-lisp
+;; (map!
+;;  (:after dired
+;;     (:map dired-mode-map
+;;     "C-SPC" #'peep-dired)))
+#+END_SRC
+**** Splitting Buffers
+This would be used when looking at a list
+and doing ~C-o s~ for horizontal split
+#+BEGIN_SRC emacs-lisp
+(after! ivy
+  (ivy-set-actions
+   'ivy-switch-buffer
+   '(("s" evil-window-split "split horizontally")
+     ("v" evil-window-vsplit "split vertically")))
+  (ivy-set-actions
+   'counsel-find-file
+   '(("s" evil-window-split "split horizontally")
+     ("v" evil-window-vsplit "split vertically"))))
+#+END_SRC
+**** Treemacs
+Allow ~C-h~ and ~C-l~ to switch buffers
+#+BEGIN_SRC emacs-lisp
+;; (map!
+;;  (:after treemacs-evil
+;;    (:map evil-treemacs-state-map
+;;      "C-h" #'evil-window-left
+;;      "C-l" #'evil-window-right)))
+#+END_SRC
+**** TODO Change Tab quickly with HJKL
+#+BEGIN_SRC emacs-lisp
+;; (setq doom-localleader-key ";")
+#+END_SRC
+**** Show keybind help with less of a delay
+#+BEGIN_SRC emacs-lisp
+(after! which-key
+  (setq which-key-idle-delay 0.5
+        which-key-idle-secondary-delay 0.01
+        which-key-sort-order 'which-key-key-order-alpha))
+#+END_SRC
+*** [[doom:core/core-os.el][Os]]
+**** Mouse wheel
+#+BEGIN_SRC emacs-lisp
+(setq mouse-wheel-scroll-amount '(3)
+      mouse-wheel-progressive-speed t
+      mouse-wheel-follow-mouse t
+      scroll-step 1)
+#+END_SRC
+*** [[doom:core/autoload/scratch.el][Scratch]]
+**** Make scratchpad buffers inherit the major mode of the current buffer
+#+BEGIN_SRC emacs-lisp
+(setq doom-scratch-buffer-major-mode t)
+#+END_SRC
+*** [[doom:core/core-ui.el][Ui]]
+**** Highlight trailing whitespace
+#+BEGIN_SRC emacs-lisp
+(setq show-trailing-whitespace t)
+#+END_SRC
+**** Set the scale factor for ~all-the-icons~
+#+BEGIN_SRC emacs-lisp
+(after! all-the-icons
+  (setq all-the-icons-scale-factor 1.0))
+#+END_SRC
+**** Immediately show eldoc
+#+BEGIN_SRC emacs-lisp
+;; (setq eldoc-idle-delay 0)
+#+END_SRC
+** Doom modules
+Here I make customization to all the modules I have enabled in doom.
+Each of the headers is a link to their respective module
