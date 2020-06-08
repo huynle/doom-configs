@@ -24,7 +24,6 @@
     - [[#ui][Ui]]
   - [[#doom-modules][Doom modules]]
     - [[#orgmode][Orgmode]]
-    - [[#org-download][Org-Download]]
     - [[#centaur-tabs][Centaur Tabs]]
     - [[#doom-modeline][Doom-modeline]]
 
@@ -168,7 +167,16 @@ Allow ~C-h~ and ~C-l~ to switch buffers
 ;;      "C-h" #'evil-window-left
 ;;      "C-l" #'evil-window-right)))
 #+END_SRC
-**** TODO Change Tab quickly with HJKL
+**** Buffer Handling
+***** TODO close the current buffer with 'q'
++ want to be able to manulate buffer similar to Vim
++ This will probably taking some diggin because ~:q~ is tied o EVIL mode?
+  try looking up ~evil-delete-window~
+  or just ~delete-window~ in general
++ in Emacs this feature is ~C-x, 0~ to delete the current window
+  to delete the other window it would be ~C-x, 1~
+
+
 #+BEGIN_SRC emacs-lisp
 ;; (setq doom-localleader-key ";")
 #+END_SRC
@@ -211,33 +219,67 @@ Allow ~C-h~ and ~C-l~ to switch buffers
 (setq doom-line-numbers-style 'relative)
 #+END_SRC
 ** Doom modules
-Here I make customization to all the modules I have enabled in doom.
-Each of the headers is a link to their respective module
+Here I make customization to all the modules I have enabled in doom. Each of the headers is a link to their respective module
 *** Orgmode
 here everything for org should be in ~~/docs/org~ folder
++ setting the agenda files, allow orgmode to scan through to create agenda
+
 #+BEGIN_SRC emacs-lisp
 (use-package! org
   :config
   (setq org-agenda-files (file-expand-wildcards "~/docs/org/*.org"))
   (setq org-directory (expand-file-name "~/docs/org"))
   (setq org-cycle-separator-lines 1)
-  (defvar +org-dir (expand-file-name "~/docs/org"))
+  (defvar +org-dir (expand-file-name "~/docs/org")))
+
+#+END_SRC
+**** Org-Capture
+Capture things quickly - [[https://emacsnyc.org/assets/documents/how-i-use-org-capture-and-stuff.pdf][good article to help]]
+
+#+BEGIN_SRC emacs-lisp
+(use-package! org
+  :config
   (setq org-capture-templates
-        '(("c" "Code Task" entry (file+headline "~/docs/org/main.org" "Coding Tasks")
+        '(("l" "Linked Tasks" entry (file+headline "~/docs/org/gtd.org" "Linked Tasks")
            "* TODO %?\n  Entered on: %U - %a\n")
-          ("t" "Task" entry (file+headline "~/docs/org/main.org" "Tasks")
-           "* TODO %?\n  Entered on: %U")
-          ("n" "Note" entry (file+datetree "~/docs/org/main.org")
+          ("t" "Tasks" entry (file+headline "~/docs/org/gtd.org" "Tasks")
+           "* TODO %?\n  Entered on: %U\n")
+          ("p" "Private" entry (file+datetree "~/docs/org/logbook.org")
+           "* %?\n\n")
+          ("j" "Journal" entry (file+datetree "~/docs/org/journal.org")
            "* %?\n\n"))))
 #+END_SRC
-*** Org-Download
-set image directory
 
-+ there is ~org-attach-directory~ and ~org-download-image-dir~
+**** Org-Download
+
+there is ~org-attach-directory~ and ~org-download-image-dir~
+
+***** Setting attachment method
+the ~attach~ method is used to keep the data structure consistent with org-mode attachment system
 
 #+BEGIN_SRC emacs-lisp
 ;; (setq org-attach-directory $HOME/testing/attachment)
+(setq org-download-method 'attach)
 #+END_SRC
+
+***** DONE ChromeOS clipbaord setting for screenshot
+need to get this fix for MacOS since the same ~xclip~ clipboard is not being used
+
+#+BEGIN_SRC emacs-lisp
+;; (setq org-attach-directory $HOME/testing/attachment)
+(setq org-download-screenshot-method "xclip -selection clipboard -t image/png -o > %s")
+#+END_SRC
+***** TODO [#A] MacOS Clipboard setting for screenshot
+**** Org-Agenda
+
+#+BEGIN_SRC emac-lisp
+(setq org-agenda-custom-commands
+      '(("%" "Appointments" agenda* "Today's appointments"
+	 ((org-agenda-span 1)
+          (org-agenda-max-entries 3)))))
+#+END_SRC
+
+
 *** Centaur Tabs
 
 #+BEGIN_SRC emacs-lisp
