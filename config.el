@@ -108,9 +108,91 @@
 ;; (setq org-attach-directory $HOME/testing/attachment)
 (setq org-download-method 'attach)
 ;; (setq org-attach-directory $HOME/testing/attachment)
-(setq org-download-screenshot-method "xclip -selection clipboard -t image/png -o > %s")
+;; (setq org-download-screenshot-method "xclip -selection clipboard -t image/png -o > %s")
+(setq org-download-screenshot-method "pngpaste %s")
+(setq org-agenda-custom-commands
+      '(("%" "Appointments" agenda* "Today's appointments"
+	 ((org-agenda-span 1)
+          (org-agenda-max-entries 3)))))
 (setq centaur-tabs-height 25)
 (setq centaur-tabs-cycle-scope 'tabs)
+;; (defun my-dnd-func (event)
+;;   (interactive "e")
+;;   (goto-char (nth 1 (event-start event)))
+;;   (x-focus-frame nil)
+;;   (let* ((payload (car (last event)))
+;;          (type (car payload))
+;;          (fname (cadr payload))
+;;          (img-regexp "\\(png\\|jp[e]?g\\)\\>"))
+;;     (cond
+;;      ;; insert image link
+;;      ((and  (eq 'drag-n-drop (car event))
+;;             (eq 'file type)
+;;             (string-match img-regexp fname))
+;;       (insert (format "[[%s]]" fname))
+;;       (org-display-inline-images t t))
+;;      ;; insert image link with caption
+;;      ((and  (eq 'C-drag-n-drop (car event))
+;;             (eq 'file type)
+;;             (string-match img-regexp fname))
+;;       (insert "#+ATTR_ORG: :width 300\n")
+;;       (insert (concat  "#+CAPTION: " (read-input "Caption: ") "\n"))
+;;       (insert (format "[[%s]]" fname))
+;;       (org-display-inline-images t t))
+;;      ;; C-drag-n-drop to open a file
+;;      ((and  (eq 'C-drag-n-drop (car event))
+;;             (eq 'file type))
+;;       (find-file fname))
+;;      ((and (eq 'M-drag-n-drop (car event))
+;;            (eq 'file type))
+;;       (insert (format "[[attachfile:%s]]" fname)))
+;;      ;; regular drag and drop on file
+;;      ((eq 'file type)
+;;       (insert (format "[[%s]]\n" fname)))
+;;      (t
+;;       (error "I am not equipped for dnd on %s" payload)))))
+
+
+;; (define-key org-mode-map (kbd "<drag-n-drop>") 'my-dnd-func)
+;; (define-key org-mode-map (kbd "<C-drag-n-drop>") 'my-dnd-func)
+;; (define-key org-mode-map (kbd "<M-drag-n-drop>") 'my-dnd-func)
+(global-set-key [M-s-drag-n-drop] 'ns-drag-n-drop-as-text)
+;; (defun org-insert-clipboard-image (&optional file)
+;;   (interactive "F")
+;;   (shell-command (concat "pngpaste " file))
+;;   (insert (concat "[[" file "]]"))
+;;   (org-display-inline-images))
+
+;; (defun my/org-insert-clipboard ()
+;;     (interactive)
+;;     (setq myvar/folder-path (concat default-directory "img/")) ;make the img directory
+;;     (if (not (file-exists-p myvar/folder-path))
+;;         (mkdir myvar/folder-path)) ;create the directory if it doesn't exist
+;;     (let* ((image-file (concat
+;;                         myvar/folder-path
+;;                         (buffer-name)
+;;                         "_"
+;;                         (format-time-string "%Y%m%d_%H%M%S_.png")))
+;;            (exit-status
+;;             (call-process "convert" nil nil nil
+;;                           "clipboard:" image-file)))
+;;       (org-insert-link nil (concat "file:" image-file) "")
+;;       (org-display-inline-images)))
+
+
+(defun org-insert-image ()
+  (interactive)
+  (let* ((path (concat default-directory "data/"))
+         (image-file (concat
+                      path
+                      (buffer-name)
+                      (format-time-string "_%Y%m%d_%H%M%S.png"))))
+    (if (not (file-exists-p path))
+        (mkdir path))
+    (shell-command (concat "pngpaste " image-file))
+    (org-insert-link nil (concat "file:" image-file) ""))
+    ;; (org-display-inline-images) ;; show inline picture
+  )
 ;; (setq doom-modeline-def-modeline "project")
 
 ;; (use-package doom-modeline
