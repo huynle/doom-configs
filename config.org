@@ -272,7 +272,7 @@ need to get this fix for MacOS since the same ~xclip~ clipboard is not being use
 ***** TODO [#A] MacOS Clipboard setting for screenshot
 **** Org-Agenda
 
-#+BEGIN_SRC emac-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-agenda-custom-commands
       '(("%" "Appointments" agenda* "Today's appointments"
 	 ((org-agenda-span 1)

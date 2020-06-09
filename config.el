@@ -109,6 +109,10 @@
 (setq org-download-method 'attach)
 ;; (setq org-attach-directory $HOME/testing/attachment)
 (setq org-download-screenshot-method "xclip -selection clipboard -t image/png -o > %s")
+(setq org-agenda-custom-commands
+      '(("%" "Appointments" agenda* "Today's appointments"
+	 ((org-agenda-span 1)
+          (org-agenda-max-entries 3)))))
 (setq centaur-tabs-height 25)
 (setq centaur-tabs-cycle-scope 'tabs)
 ;; (setq doom-modeline-def-modeline "project")
