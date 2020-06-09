@@ -150,15 +150,15 @@ Here I set my keybinds these are applied on top of the [[doom-modules:config/def
 This would be used when looking at a list
 and doing ~C-o s~ for horizontal split
 #+BEGIN_SRC emacs-lisp
-(after! ivy
-  (ivy-set-actions
-   'ivy-switch-buffer
-   '(("s" evil-window-split "split horizontally")
-     ("v" evil-window-vsplit "split vertically")))
-  (ivy-set-actions
-   'counsel-find-file
-   '(("s" evil-window-split "split horizontally")
-     ("v" evil-window-vsplit "split vertically"))))
+;; (after! ivy
+;;   (ivy-set-actions
+;;    'ivy-switch-buffer
+;;    '(("s" evil-window-split "split horizontally")
+;;      ("v" evil-window-vsplit "split vertically")))
+;;   (ivy-set-actions
+;;    'counsel-find-file
+;;    '(("s" evil-window-split "split horizontally")
+;;      ("v" evil-window-vsplit "split vertically"))))
 #+END_SRC
 **** Treemacs
 Allow ~C-h~ and ~C-l~ to switch buffers
@@ -189,6 +189,7 @@ Allow ~C-h~ and ~C-l~ to switch buffers
         which-key-idle-secondary-delay 0.01
         which-key-sort-order 'which-key-key-order-alpha))
 #+END_SRC
+
 *** [[doom:core/core-os.el][Os]]
 **** Mouse wheel
 #+BEGIN_SRC emacs-lisp
@@ -273,6 +274,7 @@ need to get this fix for MacOS since the same ~xclip~ clipboard is not being use
 (setq org-download-screenshot-method "pngpaste %s")
 #+END_SRC
 ***** TODO [#A] MacOS Clipboard setting for screenshot
+
 **** Org-Agenda
 
 #+BEGIN_SRC emacs-lisp
