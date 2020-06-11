@@ -17,6 +17,7 @@
     - [[#set-full-name][Set full name]]
     - [[#set-email-address][Set email address]]
   - [[#doom-core][Doom core]]
+    - [[#emacsserver][EmacsServer]]
     - [[#core][Core]]
     - [[#keybinds][Keybinds]]
     - [[#os][Os]]
@@ -55,6 +56,13 @@ Things to keep in mind
 ** Doom core
 
 Here I setup my config for the =doom-emacs= [[doom:core/][core]]
+*** EmacsServer
+
+#+BEGIN_SRC emacs-lisp
+;; (load "server")
+;; (unless (server-running-p) (server-start))
+#+END_SRC
+
 *** [[doom:core/core.el][Core]]
 **** Do not create lockfiles for files being edited
 #+BEGIN_SRC emacs-lisp
@@ -271,17 +279,28 @@ need to get this fix for MacOS since the same ~xclip~ clipboard is not being use
 #+BEGIN_SRC emacs-lisp
 ;; (setq org-attach-directory $HOME/testing/attachment)
 ;; (setq org-download-screenshot-method "xclip -selection clipboard -t image/png -o > %s")
-(setq org-download-screenshot-method "pngpaste %s")
+
+(after! org
+  (setq org-download-screenshot-method "pngpaste %s"))
 #+END_SRC
 ***** TODO [#A] MacOS Clipboard setting for screenshot
+
+**** Org-Journal
+
+
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (setq org-journal-file-type 'weekly))
+#+END_SRC
 
 **** Org-Agenda
 
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-custom-commands
+(after! org
+  (setq org-agenda-custom-commands
       '(("%" "Appointments" agenda* "Today's appointments"
 	 ((org-agenda-span 1)
-          (org-agenda-max-entries 3)))))
+          (org-agenda-max-entries 3))))))
 #+END_SRC
 
 
