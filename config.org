@@ -29,6 +29,7 @@
     - [[#custom-drag-and-drop-function][Custom drag and drop function]]
     - [[#custom-copy-and-paste-images][Custom copy and paste images]]
     - [[#doom-modeline][Doom-modeline]]
+- [[#load-custom-bindings][Load custom bindings]]
 
 * [[https://github.com/Brettm12345/doom-emacs-literate-config][Original Repo]]
 To get more configurations get it from here. This is really good, allows me to annotate all my changes to the default DOOM configuration
@@ -427,4 +428,9 @@ change mode line so we can see projects!
 ;; (defun setup-custom-doom-modeline ()
 ;;     (doom-modeline-set-modeline 'my-simple-line 'default))
 ;; (add-hook 'doom-modeline-mode-hook 'setup-custom-doom-modeline)
+#+END_SRC
+* Load custom bindings
+
+#+BEGIN_SRC emacs-lisp
+(load! "+bindings")
 #+END_SRC
