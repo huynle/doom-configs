@@ -25,11 +25,14 @@
     - [[#ui][Ui]]
   - [[#doom-modules][Doom modules]]
     - [[#orgmode][Orgmode]]
+    - [[#tmux-pane][Tmux-pane]]
     - [[#centaur-tabs][Centaur Tabs]]
+    - [[#elscreen][Elscreen]]
     - [[#custom-drag-and-drop-function][Custom drag and drop function]]
     - [[#custom-copy-and-paste-images][Custom copy and paste images]]
     - [[#doom-modeline][Doom-modeline]]
-- [[#load-custom-bindings][Load custom bindings]]
+- [[#theme-messed-up-between-emacsclient-and-gui][theme messed up between emacsclient and gui]]
+- [[#loadkkkj-customuu-bindingsujk][Loadkkkj CUSTOMuu BINDINGSujk]]
 
 * [[https://github.com/Brettm12345/doom-emacs-literate-config][Original Repo]]
 To get more configurations get it from here. This is really good, allows me to annotate all my changes to the default DOOM configuration
@@ -128,7 +131,7 @@ Here I set my keybinds these are applied on top of the [[doom-modules:config/def
 ;; (interactive)
 ;; (if (ignore-errors (funcall (intern (concat "windmove-" dir))))
 ;; nil                       ;; Moving within emacs
-;; (shell-command tmux-cmd)) ;; At edges, send command to tmux
+;; (shell-command "tmux" )) ;; At edges, send command to tmux
 ;; )
 
 ;; ;Move between windows with custom keybindings
@@ -227,8 +230,9 @@ Allow ~C-h~ and ~C-l~ to switch buffers
 ;; (setq eldoc-idle-delay 0)
 #+END_SRC
 **** Enable relative line number
+this is set in init.el
 #+BEGIN_SRC emacs-lisp
-(setq doom-line-numbers-style 'relative)
+;; (setq doom-line-numbers-style 'relative)
 #+END_SRC
 ** Doom modules
 Here I make customization to all the modules I have enabled in doom. Each of the headers is a link to their respective module
@@ -304,12 +308,54 @@ need to get this fix for MacOS since the same ~xclip~ clipboard is not being use
           (org-agenda-max-entries 3))))))
 #+END_SRC
 
+*** Tmux-pane
+
+#+BEGIN_SRC emacs-lisp
+(use-package! tmux-pane
+  :config
+  (tmux-pane-mode)
+  (map! :leader
+        (:prefix ("v" . "tmux pane")
+          :desc "Open vpane" :nv "o" #'tmux-pane-open-vertical
+          :desc "Open hpane" :nv "h" #'tmux-pane-open-horizontal
+          :desc "Open hpane" :nv "s" #'tmux-pane-open-horizontal
+          :desc "Open vpane" :nv "v" #'tmux-pane-open-vertical
+          :desc "Close pane" :nv "c" #'tmux-pane-close
+          :desc "Rerun last command" :nv "r" #'tmux-pane-rerun))
+  (map! :leader
+        (:prefix "t"
+          :desc "vpane" :nv "v" #'tmux-pane-toggle-vertical
+          :desc "hpane" :nv "h" #'tmux-pane-toggle-horizontal)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(map!
+  :after tmux-pane
+  :map tmux-pane-mode-map
+  "C-j"
+  (general-predicate-dispatch
+    (cmd! (tmux-pane--windmove "down"  "tmux select-pane -D"))
+    (minibufferp)
+    #'ivy-next-line)
+  "C-k"
+  (general-predicate-dispatch
+    (cmd! (tmux-pane--windmove "up"  "tmux select-pane -I"))
+    (minibufferp)
+    #'ivy-previous-line)
+  )
+#+END_SRC
 
 *** Centaur Tabs
 
 #+BEGIN_SRC emacs-lisp
 (setq centaur-tabs-height 25)
 (setq centaur-tabs-cycle-scope 'tabs)
+#+END_SRC
+
+*** Elscreen
+
+#+BEGIN_SRC emacs-lisp
+;; (elscreen-start)
 #+END_SRC
 
 *** Custom drag and drop function
@@ -429,7 +475,13 @@ change mode line so we can see projects!
 ;;     (doom-modeline-set-modeline 'my-simple-line 'default))
 ;; (add-hook 'doom-modeline-mode-hook 'setup-custom-doom-modeline)
 #+END_SRC
-* Load custom bindings
+* theme messed up between emacsclient and gui
+
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
+* Loadkkkj CUSTOMuu BINDINGSujk
 
 #+BEGIN_SRC emacs-lisp
 (load! "+bindings")

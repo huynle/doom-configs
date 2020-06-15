@@ -67,6 +67,36 @@
    "c"       #'+workspace/close-window-or-workspace
    )
 
+ )
+
+(map!
+ (:after org
+   ; I use org-capture more than the scratch buffer - swap the keys around
+   :leader
+   :desc "org capture" :g "x" #'counsel-projectile-org-capture ; shows both project-specific & generic options
+   :desc "pop scratch buffer" :g "X" #'doom/open-scratch-buffer
+   ))
+
+;;; * edit
+;;; ** disable `s-x' on macOS to prevent accidental deletions
+(map! "s-x" nil)
+
+ ;; ivy
+(map!
+ (:after ivy
+   :map ivy-minibuffer-map
+   [escape] #'keyboard-escape-quit
+   "M-v" #'yank
+   "M-z" #'undo
+   "C-r" #'evil-paste-from-register
+   "C-k" #'ivy-previous-line
+   "C-j" #'ivy-next-line
+   "C-l" #'ivy-alt-done
+   "C-w" #'ivy-backward-kill-word
+   "C-u" #'ivy-kill-line
+   "C-b" #'backward-word
+   "C-f" #'forward-word)
+ )
 
  ;; Leader Configs
  ;; (:leader
@@ -173,26 +203,11 @@
    ;;   :desc "Switch to 8th workspace"  :n "7"   (λ! (+workspace/switch-to 7))
    ;;   :desc "Switch to 9th workspace"  :n "8"   (λ! (+workspace/switch-to 8)))
 
-   )
 
  ;; (:after magit
  ;;   :map magit-blame-mode-map
  ;;   :n "q" #'magit-blame-quit)
 
- ;; ;; ivy
- ;; (:after ivy
- ;;   :map ivy-minibuffer-map
- ;;   [escape] #'keyboard-escape-quit
- ;;   "M-v" #'yank
- ;;   "M-z" #'undo
- ;;   "C-r" #'evil-paste-from-register
- ;;   "C-k" #'ivy-previous-line
- ;;   "C-j" #'ivy-next-line
- ;;   "C-l" #'ivy-alt-done
- ;;   "C-w" #'ivy-backward-kill-word
- ;;   "C-u" #'ivy-kill-line
- ;;   "C-b" #'backward-word
- ;;   "C-f" #'forward-word)
 
  ;; ;; neotree
  ;; (:after neotree
@@ -404,4 +419,4 @@
 ;;              (lsp-session-folders)
 ;;              ;; (--first (f-ancestor-of? it (f-canonical file-name)))
 ;;              )))
-             ;; )
+

@@ -22,7 +22,8 @@
        company           ; the ultimate code completion backend
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       ivy               ; a search engine for love and life
+       (ivy               ; a search engine for love and life
+        + fuzzy)                                ; ivy fuzzy search
 
        :ui
        ;;deft              ; notational velocity for Emacs
@@ -142,7 +143,9 @@
        ;;ocaml             ; an objective camel
        (org +dragndrop
             +journal
-            +roam)              ; organize your plain life in plain text
+            +roam
+            +noter
+            +evil-org)              ; organize your plain life in plain text
        ;;perl              ; write code no one else can comprehend
        ;;php               ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
@@ -179,5 +182,3 @@
        ;;literate
        (default +bindings +smartparens)
        literate)
-
-;; (setq doom-localleader-key ";")
