@@ -50,4 +50,9 @@
 ;(unpin! t)
 
 (package! tmux-pane)
-(package! elscreen)
+;; (package! elscreen)
+;; (package! evil-tabs)
+
+;;(package! elscreen-tab)
+;;(package! elscreen-fr)
+;;(package! elscreen-buffer-group)

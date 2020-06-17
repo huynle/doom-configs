@@ -6,97 +6,11 @@
 ;; (when (eq system-type 'darwin)
 ;;   (setq mac-command-modifier 'meta))
 
-(map!
-
- ;; Ensure there are no conflicts
- :nmvo doom-leader-key nil
- :nmvo doom-localleader-key nil
-
- ;; --- Global keybindings ---------------------------
- ;; Make M-x available everywhere
- ;; :gnvime "M-x" #'execute-extended-command
- ;; :gnvime "A-x" #'execute-extended-command
-
- ;; A little sandbox to run code in
- ;; :gnvime "M-;" #'eval-expression
- ;; :gnvime "M-:" #'doom/open-scratch-buffer
-
- ;; Window Movements
- "C-h"    #'evil-window-left
- "C-j"    #'evil-window-down
- "C-k"    #'evil-window-up
- "C-l"    #'evil-window-right
-
- :n "q"      #'evil-window-delete
- :n "Q"      #'evil-record-macro
-
- ;; "C-`"      #'+popup/toggle
- ;; "<C-tab>"  #'+popup/other
-
- ;; :n "-" #'ranger
-
-
- :nmvo "C-p"    #'counsel-projectile-find-file
-
- ;; ;; Text-scaling
- ;; "M-+"    (λ! (text-scale-set 0))
- ;; "M-="    #'text-scale-increase
- ;; "M--"    #'text-scale-decrease
-
- ;; "M-<return>" #'doom/toggle-fullscreen
-
-
- (:map evil-window-map                  ; prefix "C-w"
-   ;; Navigation
-   "C-h"     #'evil-window-left
-   "C-j"     #'evil-window-down
-   "C-k"     #'evil-window-up
-   "C-l"     #'evil-window-right
-   "C-w"     #'ace-window
-   ;; Swapping windows
-   "H"       #'+evil/window-move-left
-   "J"       #'+evil/window-move-down
-   "K"       #'+evil/window-move-up
-   "L"       #'+evil/window-move-right
-   "C-S-w"   #'ace-swap-window
-   ;; Window undo/redo
-   "u"       #'winner-undo
-   "C-u"     #'winner-undo
-   "C-r"     #'winner-redo
-   ;; Delete window
-   "c"       #'+workspace/close-window-or-workspace
-   )
-
- )
-
-(map!
- (:after org
-   ; I use org-capture more than the scratch buffer - swap the keys around
-   :leader
-   :desc "org capture" :g "x" #'counsel-projectile-org-capture ; shows both project-specific & generic options
-   :desc "pop scratch buffer" :g "X" #'doom/open-scratch-buffer
-   ))
 
 ;;; * edit
 ;;; ** disable `s-x' on macOS to prevent accidental deletions
-(map! "s-x" nil)
+;; (map! "s-x" nil)
 
- ;; ivy
-(map!
- (:after ivy
-   :map ivy-minibuffer-map
-   [escape] #'keyboard-escape-quit
-   "M-v" #'yank
-   "M-z" #'undo
-   "C-r" #'evil-paste-from-register
-   "C-k" #'ivy-previous-line
-   "C-j" #'ivy-next-line
-   "C-l" #'ivy-alt-done
-   "C-w" #'ivy-backward-kill-word
-   "C-u" #'ivy-kill-line
-   "C-b" #'backward-word
-   "C-f" #'forward-word)
- )
 
  ;; Leader Configs
  ;; (:leader

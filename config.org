@@ -27,12 +27,14 @@
     - [[#orgmode][Orgmode]]
     - [[#tmux-pane][Tmux-pane]]
     - [[#centaur-tabs][Centaur Tabs]]
+    - [[#disabled-solarar-mode][Disabled Solarar mode]]
     - [[#elscreen][Elscreen]]
     - [[#custom-drag-and-drop-function][Custom drag and drop function]]
     - [[#custom-copy-and-paste-images][Custom copy and paste images]]
     - [[#doom-modeline][Doom-modeline]]
-- [[#theme-messed-up-between-emacsclient-and-gui][theme messed up between emacsclient and gui]]
-- [[#loadkkkj-customuu-bindingsujk][Loadkkkj CUSTOMuu BINDINGSujk]]
+  - [[#ivy][Ivy]]
+  - [[#evil-tabs][Evil-tabs]]
+  - [[#theming][Theming]]
 
 * [[https://github.com/Brettm12345/doom-emacs-literate-config][Original Repo]]
 To get more configurations get it from here. This is really good, allows me to annotate all my changes to the default DOOM configuration
@@ -74,8 +76,8 @@ Here I setup my config for the =doom-emacs= [[doom:core/][core]]
 #+END_SRC
 *** [[doom:core/core-keybinds.el][Keybinds]]
 Here I set my keybinds these are applied on top of the [[doom-modules:config/default/+emacs-bindings.el][defaults]]
-**** Global keybinds
-**** DONE Localleader
+
+**** Localleader
 + Default ~localleader~ is ~SPC-m~
 + see if we can get this updated to ~;~
 
@@ -83,20 +85,61 @@ Here I set my keybinds these are applied on top of the [[doom-modules:config/def
 (setq doom-localleader-key ";")
 (setq doom-localleader-alt-key "M-;")
 #+END_SRC
-**** Leader keybinds
+
+**** Global keybinds
+Updating EViL Keybindings
+
 #+BEGIN_SRC emacs-lisp
-(map! :leader
-      (:prefix "TAB"
-        :desc "Rename workspace"       "r"  #'+workspace/rename)
-      (:prefix "f"
-        :desc "Find remote file"      "R" #'counsel-tramp
-        :desc "Find file in dotfiles" "t" #'+brett/find-in-dotfiles
-        :desc "Browse dotfiles"       "T" #'+brett/browse-dotfiles)
-      (:prefix "n"
-        :desc "Browse mode notes"    "m" #'+brett/find-notes-for-major-mode
-        :desc "Browse project notes" "p" #'+brett/find-notes-for-project)
-      (:prefix "t"
-        :desc "Rainbow mode" "r" #'rainbow-mode))
+(map!
+
+ ;; Ensure there are no conflicts
+ :nmvo doom-leader-key nil
+ :nmvo doom-localleader-key nil
+
+ ;; --- Global keybindings ---------------------------
+ ;; Make M-x available everywhere
+ ;; :gnvime "M-x" #'execute-extended-command
+ ;; :gnvime "A-x" #'execute-extended-command
+
+ ;; A little sandbox to run code in
+ ;; :gnvime "M-;" #'eval-expression
+ ;; :gnvime "M-:" #'doom/open-scratch-buffer
+
+ ;; Window Movements
+
+ "C-h"    #'evil-window-left
+ "C-j"    #'evil-window-down
+ "C-k"    #'evil-window-up
+ "C-l"    #'evil-window-right
+
+ :n "q"      #'+workspace/close-window-or-workspace
+ :n "Q"      #'evil-record-macro
+
+ ;; "C-`"      #'+popup/toggle
+ ;; "<C-tab>"  #'+popup/other
+
+ ;; (:map evil-window-map                  ; prefix "c-w"
+ ;;   ;; navigation
+ ;;   "c-h"     #'evil-window-left
+ ;;   "c-j"     #'evil-window-down
+ ;;   "c-k"     #'evil-window-up
+ ;;   "c-l"     #'evil-window-right
+ ;;   "c-w"     #'ace-window
+ ;;   ;; swapping windows
+ ;;   "h"       #'+evil/window-move-left
+ ;;   "j"       #'+evil/window-move-down
+ ;;   "k"       #'+evil/window-move-up
+ ;;   "l"       #'+evil/window-move-right
+ ;;   "c-s-w"   #'ace-swap-window
+ ;;   ;; window undo/redo
+ ;;   "u"       #'winner-undo
+ ;;   "c-u"     #'winner-undo
+ ;;   "c-r"     #'winner-redo
+ ;;   ;; delete window
+ ;;   "c"       #'+workspace/close-window-or-workspace
+ ;;   )
+
+ )
 #+END_SRC
 **** Use ~] SPC~ and ~[ SPC~ to insert newlines above and below
  Similar to [[github:tpope/vim-unimpaired][vim-unimpaired]]
@@ -105,44 +148,6 @@ Here I set my keybinds these are applied on top of the [[doom-modules:config/def
  (:after evil
    :m  "] SPC" #'evil-motion-insert-newline-below
    :m  "[ SPC" #'evil-motion-insert-newline-above))
-#+END_SRC
-**** Easy window navigation
-#+BEGIN_SRC emacs-lisp
-;; (map!
-;;  (:after evil
-;;    :en "C-h"   #'evil-window-left
-;;    :en "C-j"   #'evil-window-down
-;;    :en "C-k"   #'evil-window-up
-;;    :en "C-l"   #'evil-window-right))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-;; Many thanks to the author of and contributors to the following posts:
-;; https://gist.github.com/mislav/5189704
-;; https://robots.thoughtbot.com/post/53022241323/seamlessly-navigate-vim-and-tmux-splits
-;;
-;; TODO: Make a script that generates tmux and emacs code without duplication
-;;
-;; NOTE: My keybindings are not the default emacs ones, using windmove
-
-;; Try to move direction, which is supplied as arg
-;; If cannot move that direction, send a tmux command to do appropriate move
-;; (defun windmove-emacs-or-tmux(dir tmux-cmd)
-;; (interactive)
-;; (if (ignore-errors (funcall (intern (concat "windmove-" dir))))
-;; nil                       ;; Moving within emacs
-;; (shell-command "tmux" )) ;; At edges, send command to tmux
-;; )
-
-;; ;Move between windows with custom keybindings
-;; (global-set-key (kbd "C-k")
-;;    '(lambda () (interactive) (windmove-emacs-or-tmux "up"  "tmux select-pane -U")))
-;; (global-set-key (kbd "C-j")
-;;    '(lambda () (interactive) (windmove-emacs-or-tmux "down"  "tmux select-pane -D")))
-;; (global-set-key (kbd "C-l")
-;;    '(lambda () (interactive) (windmove-emacs-or-tmux "right" "tmux select-pane -R")))
-;; (global-set-key (kbd "C-h")
-;;    '(lambda () (interactive) (windmove-emacs-or-tmux "left"  "tmux select-pane -L")))
 #+END_SRC
 **** Org Mode
 #+BEGIN_SRC emacs-lisp
@@ -201,7 +206,18 @@ Allow ~C-h~ and ~C-l~ to switch buffers
         which-key-idle-secondary-delay 0.01
         which-key-sort-order 'which-key-key-order-alpha))
 #+END_SRC
+**** Movement to next visual line
+useful when there are lineswrappings
 
+#+BEGIN_SRC emacs-lisp
+;; Make movement keys work like they should
+(define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+(define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+(define-key evil-motion-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+(define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+; Make horizontal movement cross lines
+(setq-default evil-cross-lines t)
+#+END_SRC
 *** [[doom:core/core-os.el][Os]]
 **** Mouse wheel
 #+BEGIN_SRC emacs-lisp
@@ -232,7 +248,7 @@ Allow ~C-h~ and ~C-l~ to switch buffers
 **** Enable relative line number
 this is set in init.el
 #+BEGIN_SRC emacs-lisp
-;; (setq doom-line-numbers-style 'relative)
+(setq display-line-numbers-type 'relative)
 #+END_SRC
 ** Doom modules
 Here I make customization to all the modules I have enabled in doom. Each of the headers is a link to their respective module
@@ -263,7 +279,18 @@ Capture things quickly - [[https://emacsnyc.org/assets/documents/how-i-use-org-c
           ("p" "Private" entry (file+datetree "~/docs/org/logbook.org")
            "* %?\n\n")
           ("j" "Journal" entry (file+datetree "~/docs/org/journal.org")
-           "* %?\n\n"))))
+           "* %?\n\n"))
+        ))
+
+(map!
+
+ (:after org
+   ; I use org-capture more than the scratch buffer - swap the keys around
+   :leader
+   :desc "org capture" :g "x" #'counsel-projectile-org-capture ; shows both project-specific & generic options
+   :desc "pop scratch buffer" :g "X" #'doom/open-scratch-buffer
+   )
+ )
 #+END_SRC
 
 **** Org-Download
@@ -310,6 +337,28 @@ need to get this fix for MacOS since the same ~xclip~ clipboard is not being use
 
 *** Tmux-pane
 
+using with emacsclient in .localrc
+
+#### setting for emacs server/client
+# emac GUI
+function em()
+{
+  # -c creates a new frame
+  # -a= fires a new emacs server if none is running
+  emacsclient -c -a= $*
+}
+# emac terminal
+function emt()
+{
+  # -c creates a new frame
+  # -a= fires a new emacs server if none is running
+  emacsclient -t -a= $*
+}
+
+
+
+
+
 #+BEGIN_SRC emacs-lisp
 (use-package! tmux-pane
   :config
@@ -345,17 +394,88 @@ need to get this fix for MacOS since the same ~xclip~ clipboard is not being use
   )
 #+END_SRC
 
+***** Easy window navigation
+#+BEGIN_SRC emacs-lisp
+;; (map!
+;;  (:after evil
+;;    :en "C-h"   #'evil-window-left
+;;    :en "C-j"   #'evil-window-down
+;;    :en "C-k"   #'evil-window-up
+;;    :en "C-l"   #'evil-window-right))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+;; Many thanks to the author of and contributors to the following posts:
+;; https://gist.github.com/mislav/5189704
+;; https://robots.thoughtbot.com/post/53022241323/seamlessly-navigate-vim-and-tmux-splits
+;;
+;; TODO: Make a script that generates tmux and emacs code without duplication
+;;
+;; NOTE: My keybindings are not the default emacs ones, using windmove
+
+;; Try to move direction, which is supplied as arg
+;; If cannot move that direction, send a tmux command to do appropriate move
+;; (defun windmove-emacs-or-tmux(dir tmux-cmd)
+;; (interactive)
+;; (if (ignore-errors (funcall (intern (concat "windmove-" dir))))
+;; nil                       ;; Moving within emacs
+;; (shell-command "tmux" )) ;; At edges, send command to tmux
+;; )
+
+;; ;Move between windows with custom keybindings
+;; (global-set-key (kbd "C-k")
+;;    '(lambda () (interactive) (windmove-emacs-or-tmux "up"  "tmux select-pane -U")))
+;; (global-set-key (kbd "C-j")
+;;    '(lambda () (interactive) (windmove-emacs-or-tmux "down"  "tmux select-pane -D")))
+;; (global-set-key (kbd "C-l")
+;;    '(lambda () (interactive) (windmove-emacs-or-tmux "right" "tmux select-pane -R")))
+;; (global-set-key (kbd "C-h")
+;;    '(lambda () (interactive) (windmove-emacs-or-tmux "left"  "tmux select-pane -L")))
+#+END_SRC
 *** Centaur Tabs
 
 #+BEGIN_SRC emacs-lisp
-(setq centaur-tabs-height 25)
-(setq centaur-tabs-cycle-scope 'tabs)
+(after! centaur-tabs
+    (centaur-tabs-group-by-projectile-project)
+    (setq centaur-tabs-height 15)
+    (setq centaur-tabs-bar-height 15)
+    (setq centaur-tabs-cycle-scope 'tabs)
+)
+(map!
+      (:when (featurep! :ui tabs)
+       :n "L"   #'centaur-tabs-forward
+       :n "H"   #'centaur-tabs-backward
+       )
+    )
+#+END_SRC
+
+*** Disabled Solarar mode
+
+#+BEGIN_SRC emacs-lisp
+(after! solaire-mode
+  (solaire-global-mode -1))
 #+END_SRC
 
 *** Elscreen
+some evil bindings for elscreen - [[https://www.emacswiki.org/emacs/evil-elscreen.el][here]]
 
 #+BEGIN_SRC emacs-lisp
-;; (elscreen-start)
+(use-package! elscreen
+    :config
+    (elscreen-start)
+    (map!
+    (:after elscreen
+        :n "H"    #'elscreen-previous
+        :n "L"    #'elscreen-next
+    )
+    )
+    (after! elscreen
+        (define-key evil-normal-state-map "gt" 'elscreen-next)
+        (define-key evil-normal-state-map "gT" 'elscreen-previous)
+        (setq elscreen-tab-display-kill-screen nil)
+        (setq elscreen-tab-display-control nil)
+    )
+)
 #+END_SRC
 
 *** Custom drag and drop function
@@ -475,14 +595,34 @@ change mode line so we can see projects!
 ;;     (doom-modeline-set-modeline 'my-simple-line 'default))
 ;; (add-hook 'doom-modeline-mode-hook 'setup-custom-doom-modeline)
 #+END_SRC
-* theme messed up between emacsclient and gui
+** Ivy
 
 #+BEGIN_SRC emacs-lisp
+(map!
+ (:after ivy
+   :map ivy-minibuffer-map
+   [escape] #'keyboard-escape-quit
+   "M-v" #'yank
+   "M-z" #'undo
+   "C-r" #'evil-paste-from-register
+   "C-k" #'ivy-previous-line
+   "C-j" #'ivy-next-line
+   "C-l" #'ivy-alt-done
+   "C-w" #'ivy-backward-kill-word
+   "C-u" #'ivy-kill-line
+   "C-b" #'backward-word
+   "C-f" #'forward-word)
+ )
+ #+END_SRC
+** Evil-tabs
 
+#+BEGIN_SRC emacs-lisp
+(after! evil-tabs
+  (global-evil-tabs-mode t)
+)
 #+END_SRC
-
-* Loadkkkj CUSTOMuu BINDINGSujk
+** Theming
 
 #+BEGIN_SRC emacs-lisp
-(load! "+bindings")
+
 #+END_SRC
