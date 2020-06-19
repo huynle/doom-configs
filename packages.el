@@ -48,11 +48,21 @@
 ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
+(disable-packages! solaire-mode
+                   anaconda-mode
+                   company-anaconda
+                   lsp-python-ms
+                   pyimport
+                   rtags)
 
 (package! tmux-pane)
-;; (package! elscreen)
+(disable-packages! elscreen)
+(package! sr-speedbar)
 ;; (package! evil-tabs)
 
 ;;(package! elscreen-tab)
 ;;(package! elscreen-fr)
 ;;(package! elscreen-buffer-group)
+
+(package! imenu-list)
+(disable-packages! counsel-etags)

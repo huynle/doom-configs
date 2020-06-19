@@ -3,6 +3,8 @@
 ;; (when (eq system-type 'gnu/linux)
 ;;   (setq x-super-keysym 'meta))
 
+;; (when IS-MAC (setq mac-command-modifier 'meta
+;;                    mac-option-modifier  'alt))
 ;; (when (eq system-type 'darwin)
 ;;   (setq mac-command-modifier 'meta))
 
@@ -11,7 +13,16 @@
 ;;; ** disable `s-x' on macOS to prevent accidental deletions
 ;; (map! "s-x" nil)
 
-
+(map!
+ ;; (:map override ;; general-override-mode-map
+  "C-h"    #'evil-window-left
+  "C-j"    #'evil-window-down
+  "C-k"    #'evil-window-up
+  "C-l"    #'evil-window-right
+  :n "q"      #'delete-window
+  :n "Q"      #'evil-record-macro
+ ;; )
+)
  ;; Leader Configs
  ;; (:leader
    ;; :desc "M-x"                    :nv ":"   #'execute-extended-command
