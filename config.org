@@ -5,47 +5,12 @@
 #+STARTUP: inlineimages
 #+PROPERTY: header-args :tangle yes :cache yes :results silent :padline no
 
+* Notes
+** Configuration Notes
+~use-package!~ vs ~package!~
+~use-package!~ is to be used in the ~config.el~
+~package!~ is to be used only in the ~packages.el~
 
-* Table of Contents :TOC_3_gh:
-- [[#original-repo][Original Repo]]
-  - [[#helpful-things-to-notes][Helpful Things to Notes]]
-  - [[#resources][Resources]]
-    - [[#nmartin84-github--good-for-literate-programming][nmartin84 Github :: good for literate programming]]
-    - [[#literate-doom-emacs-config--blog-post-using-org-literate-programming][Literate doom emacs config :: blog post using org literate programming]]
-  - [[#configuration-notes][Configuration Notes]]
-- [[#configuration][Configuration]]
-  - [[#personal-information][Personal Information]]
-    - [[#set-full-name][Set full name]]
-    - [[#set-email-address][Set email address]]
-  - [[#doom-core][Doom core]]
-    - [[#emacsserver][EmacsServer]]
-    - [[#core][Core]]
-    - [[#keybinds][Keybinds]]
-    - [[#os][OS]]
-    - [[#scratch][Scratch]]
-    - [[#ui][Ui]]
-  - [[#doom-modules][Doom modules]]
-    - [[#orgmode][Orgmode]]
-    - [[#tmux-pane][Tmux-pane]]
-    - [[#centaur-tabs][Centaur Tabs]]
-    - [[#disabled-solaire-mode][Disabled Solaire Mode]]
-    - [[#elscreen---disabled-in-packagesel][Elscreen - disabled in ~packages.el~]]
-    - [[#custom-drag-and-drop-function][Custom drag and drop function]]
-    - [[#custom-copy-and-paste-images][Custom copy and paste images]]
-    - [[#doom-modeline][Doom-modeline]]
-  - [[#ivy][Ivy]]
-  - [[#evil-tabs][Evil-tabs]]
-  - [[#imenu-list---tagbar][imenu-list - tagbar]]
-  - [[#theming][Theming]]
-- [[#ui-1][UI]]
-- [[#etags][etags]]
-- [[#extra-files][Extra files]]
-  - [[#custom-global-keybindings][Custom global keybindings]]
-
-* [[https://github.com/Brettm12345/doom-emacs-literate-config][Original Repo]]
-To get more configurations get it from here. This is really good, allows me to annotate all my changes to the default DOOM configuration
-
-** Helpful Things to Notes
 + run ~.emacs.d/bin/doom sync~ to get things rebuilt
   + would ~M-x doom/reload~ work? have yet to try
 
@@ -53,31 +18,60 @@ Help menus
 + ~SPC-h-o~ to bring up symbols
 + ~SPC-h-v~ to bring up variables
 + ~SPC-h-f~ to bring up functions
-
 ** Resources
 *** [[https://github.com/nmartin84/.doom.d][nmartin84 Github]] :: good for literate programming
 *** [[https://dotdoom.rgoswami.me/config.html][Literate doom emacs config]] :: blog post using org literate programming
   Really good resource, start checking out localleader stuff here
-
-** Configuration Notes
-~use-package!~ vs ~package!~
-
-~use-package!~ is to be used in the ~config.el~
-~package!~ is to be used only in the ~packages.el~
-
-* Configuration
-** Personal Information
-*** Set full name
+*** [[https://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua's Emacs configuration]][[https://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua's Emacs configuration]]
+*** [[https://blog.aaronbieber.com/2016/01/30/dig-into-org-mode.html][The Chronicle]] - good resource to learn about orgmode and detailed explanation
+* Personal Information
+** Set full name
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "Huy Le")
 #+END_SRC
-*** Set email address
+** Set email address
 #+BEGIN_SRC emacs-lisp
 (setq user-mail-address "dacrazyazn.com")
 #+END_SRC
+* Configuration
 ** Doom core
-
 Here I setup my config for the =doom-emacs= [[doom:core/][core]]
+
+#+begin_src emacs-lisp
+;; (delq! t custom-theme-load-path)                             ;get the themes that i want
+
+(add-to-list 'default-frame-alist '(fullscreen . maximized)) ; starting emacs fullscreen
+(menu-bar-mode -1)                                           ; take aware the menu bar
+
+(setq-default
+ delete-by-moving-to-trash t                                 ; Delete files to trash
+ tab-width 4                                                 ; Set width for tabs
+ uniquify-buffer-name-style 'forward                         ; Uniquify buffer names
+ window-combination-resize t                                 ; take new window space from all other windows (not just current)
+ x-stretch-cursor t)                                         ; Stretch cursor to the glyph width
+
+(setq undo-limit 80000000                                    ; Raise undo-limit to 80Mb
+      evil-want-fine-undo t                                  ; By default while in insert all changes are one big blob. Be more granular
+      auto-save-default t                                    ; Nobody likes to loose work, I certainly don't
+      inhibit-compacting-font-caches t                       ; When there are lots of glyphs, keep them in memory
+      truncate-string-ellipsis "…")                          ; Unicode ellispis are nicer than "...", and also save /precious/ space
+
+(delete-selection-mode 1)                                    ; Replace selection when inserting text
+(global-subword-mode 1)                                      ; Iterate through CamelCase words
+
+(setq create-lockfiles nil)                                  ; Dont create lockfiles for files being edited
+
+(setq doom-scratch-buffer-major-mode t)                      ; Make scratchpad buffers inherit the major mode of the current buffer
+
+#+end_src
+
+Setting whitespaces
+#+begin_src emacs-lisp
+;; (after! whitespace
+;;   ;; (setq show-trailing-whitespace t)                            ; highlight trailing whitespace
+;;   (setq whitespace-style (quote ((face tabs tab-mark))))
+;;   )
+#+end_src
 *** EmacsServer
 
 #+BEGIN_SRC emacs-lisp
@@ -85,14 +79,9 @@ Here I setup my config for the =doom-emacs= [[doom:core/][core]]
 ;; (unless (server-running-p) (server-start))
 #+END_SRC
 
-*** [[doom:core/core.el][Core]]
-**** Do not create lockfiles for files being edited
-#+BEGIN_SRC emacs-lisp
-(setq create-lockfiles nil)
-#+END_SRC
 *** [[doom:core/core-keybinds.el][Keybinds]]
-Here I set my keybinds these are applied on top of the [[doom-modules:config/default/+emacs-bindings.el][defaults]]
 
+Here I set my keybinds these are applied on top of the [[doom-modules:config/default/+emacs-bindings.el][defaults]]
 **** Localleader
 + Default ~localleader~ is ~SPC-m~
 + see if we can get this updated to ~;~
@@ -153,12 +142,16 @@ and doing ~C-o s~ for horizontal split
 **** Treemacs
 Allow ~C-h~ and ~C-l~ to switch buffers
 #+BEGIN_SRC emacs-lisp
-(after! treemacs
+(after! treemacs-evil
+    :config
+    (treemacs-display-current-project-exclusively)
     (map!
         (:after treemacs-evil
             (:map evil-treemacs-state-map
                 "C-h" #'evil-window-left
                 "C-l" #'evil-window-right
+                "s v"    #'treemacs-visit-node-horizontal-split
+                "s g"    #'treemacs-visit-node-vertical-split
                 )))
   )
 
@@ -177,39 +170,55 @@ Allow ~C-h~ and ~C-l~ to switch buffers
 useful when there are lineswrappings
 
 #+BEGIN_SRC emacs-lisp
+;; (setq evil-respect-visual-line-mode t)
 ;; Make movement keys work like they should
 (define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
 (define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
 (define-key evil-motion-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
 (define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+
 ; Make horizontal movement cross lines
 (setq-default evil-cross-lines t)
 #+END_SRC
 
-*** [[doom:core/core-os.el][OS]]
-**** Mouse wheel
+*** Mouse
 #+BEGIN_SRC emacs-lisp
 (setq mouse-wheel-scroll-amount '(3)
       mouse-wheel-progressive-speed t
       mouse-wheel-follow-mouse t
+      xterm-mouse-mode 1 ;; allow for mouse clicking in terminal
       scroll-step 1)
-#+END_SRC
 
-*** [[doom:core/autoload/scratch.el][Scratch]]
-**** Make scratchpad buffers inherit the major mode of the current buffer
-#+BEGIN_SRC emacs-lisp
-(setq doom-scratch-buffer-major-mode t)
+(map! :n [mouse-8] #'better-jumper-jump-backward
+      :n [mouse-9] #'better-jumper-jump-forward)
 #+END_SRC
+*** Enable mouse support of OSX and iTerm2
 
+#+begin_src emacs-lisp
+  ;; Enable mouse support
+  (unless window-system
+    (global-set-key (kbd "<mouse-4>") 'scroll-down-line)
+    (global-set-key (kbd "<mouse-5>") 'scroll-up-line))
+
+;; Enable mouse support
+(unless window-system
+  (require 'mouse)
+  (xterm-mouse-mode t)
+  (global-set-key [mouse-4] (lambda ()
+                              (interactive)
+                              (scroll-down 1)))
+  (global-set-key [mouse-5] (lambda ()
+                              (interactive)
+                              (scroll-up 1)))
+  (defun track-mouse (e))
+  (setq mouse-sel-mode t)
+)
+#+end_src
 *** [[doom:core/core-ui.el][Ui]]
-**** Highlight trailing whitespace
-#+BEGIN_SRC emacs-lisp
-(setq show-trailing-whitespace t)
-#+END_SRC
 **** Set the scale factor for ~all-the-icons~
 #+BEGIN_SRC emacs-lisp
 (after! all-the-icons
-  (setq all-the-icons-scale-factor 1.0))
+  (setq all-the-icons-scale-factor 0.5))
 #+END_SRC
 **** Immediately show eldoc
 #+BEGIN_SRC emacs-lisp
@@ -218,14 +227,18 @@ useful when there are lineswrappings
 **** Enable relative line number
 this is set in init.el
 #+BEGIN_SRC emacs-lisp
-(setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type 'visual)
 #+END_SRC
-** Doom modules
-Here I make customization to all the modules I have enabled in doom. Each of the headers is a link to their respective module
-*** Orgmode
+**** Zoom with
+**** Flyspell
+At one point, typing became noticeably laggy, Profiling revealed flyspell-post-command-hook was responsible for 47% of CPU cycles by itself! So I'm going to make use of flyspell-lazy
+#+begin_src emacs-lisp
+(after! flyspell (require 'flyspell-lazy) (flyspell-lazy-mode 1))
+#+end_src
 
+** Org-Mode
+*** General Org-mode configuration
 here everything for org should be in ~~/docs/org~ folder
-
 
 + setting the agenda files, allow orgmode to scan through to create agenda
 
@@ -233,46 +246,101 @@ here everything for org should be in ~~/docs/org~ folder
 (use-package! org
   :config
   (setq org-directory (expand-file-name "~/docs/org")
-        ;; org-agenda-files (file-expand-wildcards "~/docs/org")
-        org-agenda-files (directory-files-recursively "~/docs/org/" "\.org$")
-        org-default-notes-file (expand-file-name "~/docs/org/notes.org")
+        org-agenda-files (file-expand-wildcards "~/docs/org")
+        ;; org-agenda-files (directory-files-recursively "~/docs/org/" "\\.org$")
+        org-default-notes-file (expand-file-name "~/docs/org/scratchpad.org")
         org-cycle-separator-lines 1
-        org-todo-keywords '((sequence "TODO" "NEXT" "IN-PROGRESS" "WAITING" "|" "DONE" "CANCELED"))
-        org-log-done (quote time)
-        org-log-redeadline (quote time)
-        org-log-reschedule (quote time)
         org-enforce-todo-dependencies t
+        org-startup-folded t
+        org-imenu-depth 4
+        ;; org-cycle-separator-lines -2
+        org-archive-location (concat org-directory "/archive/%s::datetree/")
         )
+  (defvar +org-dir (expand-file-name "~/docs/org"))
 
-  (defvar +org-dir (expand-file-name "~/docs/org")))
+  )
+(after! org
+  (map! :map org-mode-map
+        :localleader
+        "n" #'org-add-note)
+  )
 #+END_SRC
 
 If the todo-keywords were to be set manually, make sure you run ~org-mode-restart~ for it to work
 
 the ~(quote time)~ is the same as ~'time~
+*** Org-Todo
+Got it fomr Sacha Chua
+The parentheses indicate keyboard shortcuts that I can use to set the task state. @ and ! toggle logging. @ prompts you for a note, and ! automatically logs the timestamp of the state change.
+[[https://pages.sachachua.com/.emacs.d/Sacha.html#org68b5ede][Sacha Chua's Emacs configuration]]
 
+To access all these different todos use
+=M-x: org-todo= or on =doom= use =;+t=
 
-**** Org-Capture
+#+begin_src emacs-lisp
+(after! org
+  (setq org-todo-keywords
+        '((sequence
+           "STARTED(s!)"
+           "TODO(t)"  ; next action
+           "NEXT(n)"  ; next action
+           "IN-PROGRESS(p)"  ; next action
+           "WAITING(w@/!)" "|" "DONE(x!)" "CANCELLED(c)")
+         (sequence "LEARN" "TRY" "TEACH" "|" "COMPLETE(x)")
+         (sequence "IDEA" "TRY" "|" "COMPLETE(x)")
+         (sequence "DRAFT(d!)" "|" "DONE(x!)"))
 
+         org-todo-keyword-faces
+         '(("TODO" . (:foreground "green" :weight bold))
+           ("DONE" . (:foreground "cyan" :weight bold))
+           ("WAITING" . (:foreground "red" :weight bold))
+           ("IN-PROGRESS" . (:foreground "yellow" :weight bold)))
+))
+
+#+end_src
+*** Org-id
+#+begin_src emacs-lisp
+(after! org
+  (setq org-id-link-to-org-use-id 't)
+)
+#+end_src
+
+*** Org-Log
+
+get all time logging into a LOGBOOK drawer
+#+begin_src emacs-lisp
+(after! org
+ (setq org-log-into-drawer "LOGBOOK")
+ (setq org-clock-into-drawer 1)
+ )
+#+end_src
+
+log time when a task is done
+if it is reschedule or redeadline, make a note for why
+#+begin_src emacs-lisp
+(after! org
+  (setq
+   org-log-done (quote time)
+   org-log-redeadline 'note
+   org-log-reschedule 'note ))
+#+end_src
+*** Org-Capture
+:PROPERTIES:
+:ID:       2d01e301-8ae0-49af-9a29-22ec48f3edf4
+:END:
 Capture things quickly - [[https://emacsnyc.org/assets/documents/how-i-use-org-capture-and-stuff.pdf][good article to help]]
 
 #+BEGIN_SRC emacs-lisp
 (after! org
   (setq org-capture-templates
         '(
-          ;; ("l" "Linked Tasks" entry (file+headline "~/docs/org/gtd.org" "Tasks") "* TODO %?\n  Entered on: %U - %a\n")
-          ;; ("t" "Tasks" entry (file+headline "~/docs/org/gtd.org" "Tasks") "* TODO %?\n  Entered on: %U\n")
-          ;; ("p" "Private" entry (file+datetree "~/docs/org/logbook.org") "* %?\n\n")
-          ("t" "Todo" entry (file org-default-notes-file) "* TODO %?\n%u\n" :clock-in t :clock-resume t)
-          ("l" "Linked Todo" entry (file org-default-notes-file) "* TODO %?\n%u\n%a\n" :clock-in t :clock-resume t)
-          ("m" "Meeting" entry (file org-default-notes-file) "* MEETING with %? :MEETING:\n%t" :clock-in t :clock-resume t)
-          ("d" "Diary" entry (file+datetree "~/docs/org/diary.org") "* %?\n%U\n" :clock-in t :clock-resume t)
-          ("i" "Idea" entry (file org-default-notes-file) "* %? :IDEA: \n%t" :clock-in t :clock-resume t)
-          ;; ("n" "Next Task" entry (file+headline org-default-notes-file "Tasks") "** NEXT %? \nDEADLINE: %t")
-          ("n" "Next Task" entry (file org-default-notes-file) "** NEXT %? \nDEADLINE: %t")
+          ("t" "Todo" entry (file+headline "~/docs/org/organizer.org" "Things To-Do") "* TODO %?\n%u\n" :clock-in t :clock-resume t)
+          ("l" "Linked Todo" entry (file+headline "~/docs/org/organizer.org" "Things To-Do") "* TODO %?\n%u\n%a\n" :clock-in t :clock-resume t)
+          ("m" "Meeting" entry (file+headline "~/docs/org/work.org" "Meeting Notes") "* MEETING with %? :@meeting:\n%t" :clock-in t :clock-resume t)
+          ("d" "Diary" entry (file+datetree "~/docs/org/diary.org") "* %?\n%U\n" :clock-in t :clock-resume t) ;; to record thoughts as you work
+          ("i" "Idea" entry (file+headline "~/docs/org/organizer.org" "Ideas") "* %? :@idea: \n%t" :clock-in t :clock-resume t)
+          ("s" "scratchpad" entry (file "~/docs/org/scratchpad.org") "* %? \n%t" :clock-in t :clock-resume t) ;; for taking real fast notes, and sort later
          ))
-
-
     (map!
         ; I use org-capture more than the scratch buffer - swap the keys around
         :leader
@@ -280,61 +348,191 @@ Capture things quickly - [[https://emacsnyc.org/assets/documents/how-i-use-org-c
          :desc "pop scratch buffer" :g "X" #'doom/open-scratch-buffer)
 )
 #+END_SRC
-**** Org-refiling
+
+#+begin_src emacs-lisp
+
+(with-eval-after-load 'org-capture
+
+  ;; (defun org-hugo-new-subtree-post-capture-template ()
+  ;;   "Returns `org-capture' template string for new Hugo post. See `org-capture-templates' for more information."
+  ;;   (let* ((title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
+  ;;          (fname (org-hugo-slug title)))
+  ;;     (mapconcat #'identity
+  ;;                `(
+  ;;                  ,(concat "* TODO " title)
+  ;;                  ":PROPERTIES:"
+  ;;                  ,(concat ":EXPORT_HUGO_BUNDLE: " fname)
+  ;;                  ":EXPORT_FILE_NAME: index"
+  ;;                  ":END:"
+  ;;                  "%?\n")                ;Place the cursor here finally
+  ;;                "\n")))
+    (defun org-hugo-new-subtree-post-capture-template ()
+    "Returns `org-capture' template string for new Hugo post.
+    See `org-capture-templates' for more information."
+    (let* (;; http://www.holgerschurig.de/en/emacs-blog-from-org-to-hugo/
+            (date (format-time-string (org-time-stamp-format :long :inactive) (org-current-time)))
+            (title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
+            (fname (org-hugo-slug title)))
+        (mapconcat #'identity
+                `(
+                    ,(concat "* TODO " title)
+                    ":PROPERTIES:"
+                    ,(concat ":EXPORT_FILE_NAME: " fname)
+                    ,(concat ":EXPORT_DATE: " date) ;Enter current date and time
+                    ":END:"
+                    "%?\n")                ;Place the cursor here finally
+                "\n")))
+
+    (add-to-list 'org-capture-templates
+                '("h"                ;`org-capture' binding + h
+                    "Hugo post"
+                    entry
+                    ;; It is assumed that below file is present in `org-directory'
+                    ;; and that it has a "Blog Ideas" heading. It can even be a
+                    ;; symlink pointing to the actual location of all-posts.org!
+                    (file+olp "blog-posts.org" "Blog Ideas")
+                    (function org-hugo-new-subtree-post-capture-template)))
+  )
+#+end_src
+*** Org-hugo (ox-hugo)
+
+#+begin_src emacs-lisp
+
+(after! ox-hugo
+    (setq org-hugo-default-static-subdirectory-for-externals "attached")
+            )
+#+end_src
+
+*** Org-refile
 
 
 #+BEGIN_SRC emacs-lisp
 (after! org
    (setq org-refile-allow-creating-parent-nodes 'confirm)
+   (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
 )
 #+END_SRC
-
-**** Org-Download
+*** Org-Download
 
 there is ~org-attach-directory~ and ~org-download-image-dir~
 
-***** Setting attachment method
+**** Setting attachment method
 the ~attach~ method is used to keep the data structure consistent with org-mode attachment system
 
 #+BEGIN_SRC emacs-lisp
 ;; (setq org-attach-directory $HOME/testing/attachment)
-(setq org-download-method 'attach)
+;;(setq org-download-method 'attach)
 #+END_SRC
 
-***** DONE ChromeOS clipbaord setting for screenshot
+**** DONE ChromeOS clipboard setting for screenshot
 need to get this fix for MacOS since the same ~xclip~ clipboard is not being used
 
 #+BEGIN_SRC emacs-lisp
 ;; (setq org-attach-directory $HOME/testing/attachment)
 ;; (setq org-download-screenshot-method "xclip -selection clipboard -t image/png -o > %s")
 
-(after! org
-  (setq org-download-screenshot-method "pngpaste %s"
-        ))
+(use-package! org-download
+  :config
+  (setq org-download-method 'attach
+        org-download-image-dir (concat org-directory "/images/")
+        org-download-timestamp "_%Y%m%d_%H%M%S"
+        org-download-screenshot-method
+        (cond (IS-MAC "pngpaste %s")
+              (IS-LINUX
+               (cond ((executable-find "xclip") "xclip -selection clipboard -t image/png -o > %s")
+                     ((executable-find "maim")  "maim -s %s")
+                     ((executable-find "scrot") "scrot -s %s")
+                     ((executable-find "gnome-screenshot") "gnome-screenshot -a -f %s"))))))
+;; (after! org
+;;   :config
+;;     (setq org-download-screenshot-method "pngpaste %s"
+;;             ))
 #+END_SRC
-***** TODO [#A] MacOS Clipboard setting for screenshot
+**** TODO [#A] MacOS Clipboard setting for screenshot
 
-**** Org-Journal
+*** Org-cliplink
 
-share the same fold as org-roam!! - [[https://org-roam.readthedocs.io/en/master/ecosystem/][lookie here]]
 
 #+BEGIN_SRC emacs-lisp
+
+(use-package! org-cliplink
+  :config
+  (setq org-cliplink-transport-implementation 'curl))
+#+END_SRC
+*** Org-image
+set to 400 if nothing is specified in the properties
+make sure that imagemagick is enabled
+
+#+begin_src emacs-lisp
+
 (after! org
-    (setq org-journal-dir (expand-file-name "~/docs/org/roam")
-            org-journal-date-prefix "#+TITLE: "
+    ;; (setq org-image-actual-width 1800)
+    ;; (load "~/.config/doom/org-display-inline-images-custom.el")
+  (setq org-image-actual-width '(500))
+  ;; (setq org-image-actual-width '(/ (display-pixel-width) 3))
+
+)
+#+end_src
+
+Currently ~display-pixel-width~ is not an actual variable
+*** Org-Journal
+:PROPERTIES:
+:ID:       ec33acb0-1469-4970-8953-1cf33a78f6bb
+:END:
+
+share the same fold as org-roam!! - [[https://org-roam.readthedocs.io/en/master/ecosystem/][lookie here]]
+for filtering out tags and properties - [[https://orgmode.org/manual/Matching-tags-and-properties.html][look at the manual]]
+
+#+BEGIN_SRC emacs-lisp
+(after! org-journal
+    (setq org-journal-dir (expand-file-name "~/docs/org/journal")
+            ;; org-journal-date-prefix "#+TITLE: "
             org-journal-file-format "%Y-%m-%d.org"
-            org-journal-date-format "%A, %d %B %Y"
+            ;; org-journal-date-format "%A, %d %B %Y"
+            org-journal-date-format "%A, %m/%d/%y"
             org-journal-enable-agenda-integration t
-            ;; org-journal-file-type 'weekly
+            ;; org-journal-carryover-items "/!+WAITING|+NEXT"
+            org-journal-carryover-items "/!-DONE|-CANCELLED"
+            org-journal-file-type 'weekly
             )
-    (map! :leader
-        (:prefix "o"                      ; toggle
-        :desc "Journal file"            "j" #'org-journal-open-current-journal-file
-        ))
+
+    (map! (:map org-journal-mode-map
+            :n "]f"  #'org-journal-open-next-entry
+            :n "[f"  #'org-journal-open-previous-entry
+            :n "C-n" #'org-journal-open-next-entry
+            :n "C-p" #'org-journal-open-previous-entry)
+            (:map org-journal-search-mode-map
+            "C-n" #'org-journal-search-next
+            "C-p" #'org-journal-search-previous)
+            :localleader
+            (:map org-journal-mode-map
+                "c" #'org-journal-new-entry
+                ;; "d" #'org-journal-new-date-entry
+                "n" #'org-add-note
+                ;; "n" #'org-journal-open-next-entry
+                ;; "p" #'org-journal-open-previous-entry
+                ;; (:prefix ("d" . "date/deadline")
+                ;; "d" #'org-agenda-deadline
+                ;; "s" #'org-agenda-schedule)
+                ;; (:prefix "s"
+                ;; "s" #'org-journal-search
+                ;; "f" #'org-journal-search-forever
+                ;; "F" #'org-journal-search-future
+                ;; "w" #'org-journal-search-calendar-week
+                ;; "m" #'org-journal-search-calendar-month
+                ;; "y" #'org-journal-search-calendar-year)
+            )
+
+            (:map org-journal-search-mode-map
+            "n" #'org-journal-search-next
+            "p" #'org-journal-search-prev))
+
 )
 #+END_SRC
 
-**** Org-roam
+
+
+*** Org-roam
 
 #+BEGIN_SRC emacs-lisp
 (after! org-roam
@@ -358,9 +556,31 @@ using deft to navigate org-roam file
       (deft-directory (expand-file-name "~/docs/org/roam")
 ))
 #+END_SRC
-
-**** Org-Agenda
+*** Org-Agenda
 all of this is from [[https://blog.aaronbieber.com/2016/09/25/agenda-interactions-primer.html][The Chonicle]]
+
+
+#+begin_src emacs-lisp
+  (map! :after org-agenda
+        :map org-agenda-mode-map
+        :m "C-SPC" #'org-agenda-show-and-scroll-up
+        :localleader
+        "n" #'org-agenda-add-note
+        (:prefix ("d" . "date/deadline")
+         "d" #'org-agenda-deadline
+         "s" #'org-agenda-schedule)
+        (:prefix ("c" . "clock")
+         "c" #'org-agenda-clock-cancel
+         "g" #'org-agenda-clock-goto
+         "i" #'org-agenda-clock-in
+         "o" #'org-agenda-clock-out
+         "r" #'org-agenda-clockreport-mode
+         "s" #'org-agenda-show-clocking-issues)
+        "q" #'org-agenda-set-tags
+        "r" #'org-agenda-refile
+        "t" #'org-agenda-todo
+        )
+#+end_src
 
 #+BEGIN_SRC emacs-lisp
 (defun air-org-skip-subtree-if-priority (priority)
@@ -386,6 +606,54 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
 
 allow you to get to the agenda really really fast with ~S-SPC~
 #+BEGIN_SRC emacs-lisp
+;; (define-key org-agenda-mode-map "j" 'org-agenda-next-item)
+;; (define-key org-agenda-mode-map "k" 'org-agenda-previous-item)
+;;
+;; (defun air-org-agenda-next-header ()
+;;   "Jump to the next header in an agenda series."
+;;   (interactive)
+;;   (air--org-agenda-goto-header))
+;;
+;; (defun air-org-agenda-previous-header ()
+;;   "Jump to the previous header in an agenda series."
+;;   (interactive)
+;;   (air--org-agenda-goto-header t))
+;;
+;; (defun air--org-agenda-goto-header (&optional backwards)
+;;   "Find the next agenda series header forwards or BACKWARDS."
+;;   (let ((pos (save-excursion
+;;                (goto-char (if backwards
+;;                               (line-beginning-position)
+;;                             (line-end-position)))
+;;                (let* ((find-func (if backwards
+;;                                      'previous-single-property-change
+;;                                    'next-single-property-change))
+;;                       (end-func (if backwards
+;;                                     'max
+;;                                   'min))
+;;                       (all-pos-raw (list (funcall find-func (point) 'org-agenda-structural-header)
+;;                                          (funcall find-func (point) 'org-agenda-date-header)))
+;;                       (all-pos (cl-remove-if-not 'numberp all-pos-raw))
+;;                       (prop-pos (if all-pos (apply end-func all-pos) nil)))
+;;                  prop-pos))))
+;;     (if pos (goto-char pos))
+;;     (if backwards (goto-char (line-beginning-position)))))
+;;
+;; (define-key org-agenda-mode-map "J" 'air-org-agenda-next-header)
+;; (define-key org-agenda-mode-map "K" 'air-org-agenda-previous-header)
+;;
+;;
+;; (defun air-org-agenda-capture (&optional vanilla)
+;;   "Capture a task in agenda mode, using the date at point.If VANILLA is non-nil, run the standard `org-capture'."
+;;   (interactive "P")
+;;   (if vanilla
+;;       (org-capture)
+;;     (let ((org-overriding-default-time (org-get-cursor-date)))
+;;       (org-capture nil "a"))))
+;;
+;; (define-key org-agenda-mode-map "c" 'air-org-agenda-capture)
+
+
 (defun air-pop-to-org-agenda (&optional split)
   "Visit the org agenda, in the current window or a SPLIT."
   (interactive "P")
@@ -393,7 +661,8 @@ allow you to get to the agenda really really fast with ~S-SPC~
   (when (not split)
     (delete-other-windows)))
 
-(define-key evil-normal-state-map (kbd "S-SPC") 'air-pop-to-org-agenda)
+
+(define-key evil-normal-state-map (kbd "M-SPC") 'air-pop-to-org-agenda)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -414,7 +683,9 @@ allow you to get to the agenda really really fast with ~S-SPC~
   ;;                    '(or (air-org-skip-subtree-if-priority ?A)
   ;;                         (org-agenda-skip-if nil '(scheduled deadline))))))))))
 
-  (setq org-agenda-custom-commands
+  (setq
+      org-agenda-skip-scheduled-if-deadline-is-shown t
+      org-agenda-custom-commands
       '(
          ("c" "Simple agenda view"
             ((tags "PRIORITY=\"A\""
@@ -437,7 +708,7 @@ allow you to get to the agenda really really fast with ~S-SPC~
                         (org-agenda-overriding-header "ALL normal priority tasks:"))))
             ((org-agenda-compact-blocks t)))
         ("h" "thing TODO at Home"
-            ((tags-todo "+dailies+SCHEDULED<=\"<today>+1\"")
+            ((tags "/!-DONE|-CANCELLED")
             (agenda "" ((org-agenda-ndays 1)
                         (org-agenda-sorting-strategy
                         (quote ((agenda time-up priority-down tag-up))))
@@ -445,19 +716,15 @@ allow you to get to the agenda really really fast with ~S-SPC~
             (tags "reading")
             (tags "writing")
             (tags-todo "REFILE"))
-            ((org-agenda-tag-filter-preset '("@work"))))
-         ))
+            ((org-agenda-tag-filter-preset '("@work")))))
+      )
 
   )
 #+END_SRC
 
-**** Resources
-+ [[https://blog.aaronbieber.com/2016/01/30/dig-into-org-mode.html][The Chronicle]] - good resource to learn about orgmode and detailed explanation
-
-*** Tmux-pane
+** Tmux-pane
 
 using with emacsclient in .localrc
-
 #### setting for emacs server/client
 # emac GUI
 function em()
@@ -474,45 +741,47 @@ function emt()
   emacsclient -t -a= $*
 }
 
-
-
+This will begins the tmux-pane, because by default, it is disabled
+*note*
+- this is not working yet... when the ivy mini buffer pops up, cannot navigate it with =c-j= and =c-k=
 
 #+BEGIN_SRC emacs-lisp
-(use-package! tmux-pane
-  :config
-  (tmux-pane-mode)
-  (map! :leader
-        (:prefix ("v" . "tmux pane")
-          :desc "Open vpane" :nv "o" #'tmux-pane-open-vertical
-          :desc "Open hpane" :nv "h" #'tmux-pane-open-horizontal
-          :desc "Open hpane" :nv "s" #'tmux-pane-open-horizontal
-          :desc "Open vpane" :nv "v" #'tmux-pane-open-vertical
-          :desc "Close pane" :nv "c" #'tmux-pane-close
-          :desc "Rerun last command" :nv "r" #'tmux-pane-rerun))
-  (map! :leader
-        (:prefix "t"
-          :desc "vpane" :nv "v" #'tmux-pane-toggle-vertical
-          :desc "hpane" :nv "h" #'tmux-pane-toggle-horizontal)))
+;; (use-package! tmux-pane
+;;   :config
+;;   (tmux-pane-mode)
+;;   ;; (map! :leader
+;;   ;;       (:prefix ("v" . "tmux pane")
+;;   ;;         :desc "Open vpane" :nv "o" #'tmux-pane-open-vertical
+;;   ;;         :desc "Open hpane" :nv "h" #'tmux-pane-open-horizontal
+;;   ;;         :desc "Open hpane" :nv "s" #'tmux-pane-open-horizontal
+;;   ;;         :desc "Open vpane" :nv "v" #'tmux-pane-open-vertical
+;;   ;;         :desc "Close pane" :nv "c" #'tmux-pane-close
+;;   ;;         :desc "Rerun last command" :nv "r" #'tmux-pane-rerun))
+;;   ;; (map! :leader
+;;   ;;       (:prefix "t"
+;;   ;;         :desc "vpane" :nv "v" #'tmux-pane-toggle-vertical
+;;   ;;         :desc "hpane" :nv "h" #'tmux-pane-toggle-horizontal))
+  ;; )
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(map!
-  :after tmux-pane
-  :map tmux-pane-mode-map
-  "C-j"
-  (general-predicate-dispatch
-    (cmd! (tmux-pane--windmove "down"  "tmux select-pane -D"))
-    (minibufferp)
-    #'ivy-next-line)
-  "C-k"
-  (general-predicate-dispatch
-    (cmd! (tmux-pane--windmove "up"  "tmux select-pane -I"))
-    (minibufferp)
-    #'ivy-previous-line)
-  )
+;; (map!
+;;   :after tmux-pane
+;;   :map tmux-pane-mode-map
+;;   "C-j"
+;;   (general-predicate-dispatch
+;;     (cmd! (tmux-pane--windmove "down"  "tmux select-pane -D"))
+;;     (minibufferp)
+;;     #'ivy-next-line)
+;;   "C-k"
+;;   (general-predicate-dispatch
+;;     (cmd! (tmux-pane--windmove "up"  "tmux select-pane -I"))
+;;     (minibufferp)
+;;     #'ivy-previous-line)
+;;   )
 #+END_SRC
 
-***** Easy window navigation
+*** Easy window navigation
 #+BEGIN_SRC emacs-lisp
 ;; (map!
 ;;  (:after evil
@@ -526,31 +795,34 @@ function emt()
 ;; Many thanks to the author of and contributors to the following posts:
 ;; https://gist.github.com/mislav/5189704
 ;; https://robots.thoughtbot.com/post/53022241323/seamlessly-navigate-vim-and-tmux-splits
-;;
+
 ;; TODO: Make a script that generates tmux and emacs code without duplication
-;;
+
 ;; NOTE: My keybindings are not the default emacs ones, using windmove
 
 ;; Try to move direction, which is supplied as arg
 ;; If cannot move that direction, send a tmux command to do appropriate move
-;; (defun windmove-emacs-or-tmux(dir tmux-cmd)
-;; (interactive)
-;; (if (ignore-errors (funcall (intern (concat "windmove-" dir))))
-;; nil                       ;; Moving within emacs
-;; (shell-command "tmux" )) ;; At edges, send command to tmux
-;; )
+(defun windmove-emacs-or-tmux(dir tmux-cmd)
+  (interactive)
+  (if (ignore-errors (funcall (intern (concat "windmove-" dir))))
+      nil                       ;; Moving within emacs
+    (shell-command tmux-cmd)) ;; At edges, send command to tmux
+  )
 
-;; ;Move between windows with custom keybindings
-;; (global-set-key (kbd "C-k")
-;;    '(lambda () (interactive) (windmove-emacs-or-tmux "up"  "tmux select-pane -U")))
-;; (global-set-key (kbd "C-j")
-;;    '(lambda () (interactive) (windmove-emacs-or-tmux "down"  "tmux select-pane -D")))
-;; (global-set-key (kbd "C-l")
-;;    '(lambda () (interactive) (windmove-emacs-or-tmux "right" "tmux select-pane -R")))
-;; (global-set-key (kbd "C-h")
-;;    '(lambda () (interactive) (windmove-emacs-or-tmux "left"  "tmux select-pane -L")))
+                                        ;Move between windows with custom keybindings
+(global-set-key (kbd "C-k")
+                '(lambda () (interactive) (windmove-emacs-or-tmux "up"  "tmux select-pane -U")))
+(global-set-key (kbd "C-j")
+                '(lambda () (interactive) (windmove-emacs-or-tmux "down"  "tmux select-pane -D")))
+(global-set-key (kbd "C-l")
+                '(lambda () (interactive) (windmove-emacs-or-tmux "right"  "tmux select-pane -R")))
+(global-set-key (kbd "C-h")
+                '(lambda () (interactive) (windmove-emacs-or-tmux "left"  "tmux select-pane -L")))
+
+;; (define-key evil-normal-state-map (kbd "S-SPC") 'air-pop-to-org-agenda)
 #+END_SRC
-*** Centaur Tabs
+
+** Centaur Tabs
 
 #+BEGIN_SRC emacs-lisp
 (after! centaur-tabs
@@ -567,7 +839,7 @@ function emt()
     )
 #+END_SRC
 
-*** Disabled Solaire Mode
+** Disabled Solaire Mode
 this allow for colorscheme to work in the terminal also
 
 #+BEGIN_SRC emacs-lisp
@@ -575,7 +847,7 @@ this allow for colorscheme to work in the terminal also
   (solaire-global-mode -1))
 #+END_SRC
 
-*** Elscreen - disabled in ~packages.el~
+** Elscreen - disabled in ~packages.el~
 some evil bindings for elscreen - [[https://www.emacswiki.org/emacs/evil-elscreen.el][here]]
 
 #+BEGIN_SRC emacs-lisp
@@ -597,175 +869,56 @@ some evil bindings for elscreen - [[https://www.emacswiki.org/emacs/evil-elscree
 )
 #+END_SRC
 
-*** Custom drag and drop function
-#+BEGIN_SRC emacs-lisp
-;; (defun my-dnd-func (event)
-;;   (interactive "e")
-;;   (goto-char (nth 1 (event-start event)))
-;;   (x-focus-frame nil)
-;;   (let* ((payload (car (last event)))
-;;          (type (car payload))
-;;          (fname (cadr payload))
-;;          (img-regexp "\\(png\\|jp[e]?g\\)\\>"))
-;;     (cond
-;;      ;; insert image link
-;;      ((and  (eq 'drag-n-drop (car event))
-;;             (eq 'file type)
-;;             (string-match img-regexp fname))
-;;       (insert (format "[[%s]]" fname))
-;;       (org-display-inline-images t t))
-;;      ;; insert image link with caption
-;;      ((and  (eq 'C-drag-n-drop (car event))
-;;             (eq 'file type)
-;;             (string-match img-regexp fname))
-;;       (insert "#+ATTR_ORG: :width 300\n")
-;;       (insert (concat  "#+CAPTION: " (read-input "Caption: ") "\n"))
-;;       (insert (format "[[%s]]" fname))
-;;       (org-display-inline-images t t))
-;;      ;; C-drag-n-drop to open a file
-;;      ((and  (eq 'C-drag-n-drop (car event))
-;;             (eq 'file type))
-;;       (find-file fname))
-;;      ((and (eq 'M-drag-n-drop (car event))
-;;            (eq 'file type))
-;;       (insert (format "[[attachfile:%s]]" fname)))
-;;      ;; regular drag and drop on file
-;;      ((eq 'file type)
-;;       (insert (format "[[%s]]\n" fname)))
-;;      (t
-;;       (error "I am not equipped for dnd on %s" payload)))))
+** Projectile
 
-
-;; (define-key org-mode-map (kbd "<drag-n-drop>") 'my-dnd-func)
-;; (define-key org-mode-map (kbd "<C-drag-n-drop>") 'my-dnd-func)
-;; (define-key org-mode-map (kbd "<M-drag-n-drop>") 'my-dnd-func)
-#+END_SRC
-
-**** Getting it to work on macos
-
-should work as normal on windows, this is needed for macos
-#+BEGIN_SRC emacs-lisp
-(global-set-key [M-s-drag-n-drop] 'ns-drag-n-drop-as-text)
-#+END_SRC
-
-*** Custom copy and paste images
-
-#+BEGIN_SRC emacs-lisp
-;; (defun org-insert-clipboard-image (&optional file)
-;;   (interactive "F")
-;;   (shell-command (concat "pngpaste " file))
-;;   (insert (concat "[[" file "]]"))
-;;   (org-display-inline-images))
-
-;; (defun my/org-insert-clipboard ()
-;;     (interactive)
-;;     (setq myvar/folder-path (concat default-directory "img/")) ;make the img directory
-;;     (if (not (file-exists-p myvar/folder-path))
-;;         (mkdir myvar/folder-path)) ;create the directory if it doesn't exist
-;;     (let* ((image-file (concat
-;;                         myvar/folder-path
-;;                         (buffer-name)
-;;                         "_"
-;;                         (format-time-string "%Y%m%d_%H%M%S_.png")))
-;;            (exit-status
-;;             (call-process "convert" nil nil nil
-;;                           "clipboard:" image-file)))
-;;       (org-insert-link nil (concat "file:" image-file) "")
-;;       (org-display-inline-images)))
-
-
-(defun org-insert-image ()
-  (interactive)
-  (let* ((path (concat default-directory "data/"))
-         (image-file (concat
-                      path
-                      (buffer-name)
-                      (format-time-string "_%Y%m%d_%H%M%S.png"))))
-    (if (not (file-exists-p path))
-        (mkdir path))
-    (shell-command (concat "pngpaste " image-file))
-    (org-insert-link nil (concat "file:" image-file) ""))
-    ;; (org-display-inline-images) ;; show inline picture
+#+begin_src emacs-lisp
+(after! projectile
+  (setq org-tags-exclude-from-inheritance '("project"))
+  (add-to-list 'projectile-globally-ignored-directories "archive")
   )
-#+END_SRC
 
-*** Doom-modeline
-change mode line so we can see projects!
-#+BEGIN_SRC emacs-lisp
-;; (setq doom-modeline-def-modeline "project")
+#+end_src
 
-;; (use-package doom-modeline
-;;   :ensure t
-;;   :init (doom-modeline-mode 1)
-;;   )
-;; (with-eval-after-load "doom-modeline"
-;;   (doom-modeline-def-modeline 'main
-;;   '(misc-info bar workspace-name window-number modals matches buffer-info remote-host buffer-position word-count parrot selection-info)
-;;   '(objed-state persp-name battery grip irc mu4e gnus github debug lsp minor-modes input-method indent-info buffer-encoding major-mode process vcs checker)
-;;   )
-;; )
-  ;; Define your custom doom-modeline
-;; (doom-modeline-def-modeline 'my-simple-line
-;;     '(bar " " buffer-info)
-;;     '(misc-info))
-
-;; ;; Add to `doom-modeline-mode-hook` or other hooks
-;; (defun setup-custom-doom-modeline ()
-;;     (doom-modeline-set-modeline 'my-simple-line 'default))
-;; (add-hook 'doom-modeline-mode-hook 'setup-custom-doom-modeline)
-#+END_SRC
-** Ivy
-
-#+BEGIN_SRC emacs-lisp
-(map!
- (:after ivy
-   :map ivy-minibuffer-map
-   [escape] #'keyboard-escape-quit
-   "M-v" #'yank
-   "M-z" #'undo
-   "C-r" #'evil-paste-from-register
-   "C-k" #'ivy-previous-line
-   "C-j" #'ivy-next-line
-   "C-l" #'ivy-alt-done
-   "C-w" #'ivy-backward-kill-word
-   "C-u" #'ivy-kill-line
-   "C-b" #'backward-word
-   "C-f" #'forward-word)
- )
- #+END_SRC
-** Evil-tabs
-
-#+BEGIN_SRC emacs-lisp
-(after! evil-tabs
-  (global-evil-tabs-mode t)
-)
-#+END_SRC
-
-
-** imenu-list - tagbar
-
-#+BEGIN_SRC emacs-lisp
-(use-package! imenu-list
-  :defer t
-  :config
-  (set-popup-rules! '(("^\\*Ilist\\*" :side right :size 40 :select t))))
+** Tramp insert file
+insert file from remote server
+#+begin_src emacs-lisp
+(defun hle-insert-vnc1-vbuf ()
+  (interactive)
+  (insert-file "/ssh:socd:~/.vbuf")
+   )
 
 (map! :leader
-      (:prefix "t"                      ; toggle
-       :desc "Imenu list"            "t" #'imenu-list-smart-toggle
-       ))
-#+END_SRC
-** Theming
+         :desc "vbuf paste" :g "y" #'hle-insert-vnc1-vbuf
+       )
 
-#+BEGIN_SRC emacs-lisp
+;; (define-key evil-normal-state-map (kbd "SPC-y") 'hle-insert-vnc1-vbuf)
+#+end_src
+** Better Jumper
+#+begin_src emacs-lisp
+ (after! better-jumper
+   (setq better-jumper-context 'window)
+ )
+ #+END_SRC
+** Evil
+*** Snipe
+#+begin_src emacs-lisp
+ (after! evil-snipe
+   (setq evil-snipe-scope 'visible)
+ )
+ #+END_SRC
 
-#+END_SRC
 
-* UI
+** Workspaces
 #+BEGIN_SRC emacs-lisp
 (setq +workspaces-on-switch-project-behavior t)
+
+;; workspace configuration
+;;   - do not create new workspace for each session
+(after! persp-mode
+  (setq persp-emacsclient-init-frame-behaviour-override "main"))
 #+END_SRC
-* etags
+
+** Counsel
 #+BEGIN_SRC emacs-lisp
 (use-package! counsel-etags
   :defer t
@@ -784,8 +937,22 @@ change mode line so we can see projects!
  )
 #+END_SRC
 
-* Extra files
-** Custom global keybindings
+** make it vim normal
+
+*** Restoring old Y behavior (yank the whole line)
+#+BEGIN_SRC elisp
+;; add to ~/.doom.d/config.el
+(setq! evil-want-Y-yank-to-eol nil)
+#+END_SRC
+
+*** Disabling cursor movement when exiting insert mode
+#+BEGIN_SRC elisp
+;; add to ~/.doom.d/config.el
+(setq evil-move-cursor-back nil)
+#+END_SRC
+
+* Custom global keybindings
+load this at the very end, may be able to move this to the "keybind"
 #+BEGIN_SRC emacs-lisp
 (load! "+bindings.el")
 #+END_SRC

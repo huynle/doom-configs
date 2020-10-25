@@ -5,23 +5,105 @@
 
 ;; (when IS-MAC (setq mac-command-modifier 'meta
 ;;                    mac-option-modifier  'alt))
+;;
 ;; (when (eq system-type 'darwin)
 ;;   (setq mac-command-modifier 'meta))
+;; (when (eq system-type 'gnu/linux)
+;;   (setq x-super-keysym 'meta))
 
+;; (when (eq system-type 'darwin)
+;;   (setq mac-command-modifier 'meta))
 
 ;;; * edit
 ;;; ** disable `s-x' on macOS to prevent accidental deletions
 ;; (map! "s-x" nil)
 
 (map!
- ;; (:map override ;; general-override-mode-map
-  "C-h"    #'evil-window-left
-  "C-j"    #'evil-window-down
-  "C-k"    #'evil-window-up
-  "C-l"    #'evil-window-right
-  :n "q"      #'delete-window
+  ;; Ensure there are no conflicts
+  :nmvo doom-leader-key nil
+  :nmvo doom-localleader-key nil
+
+  ;; (:map override ;; general-override-mode-map
+  ;; "C-h"    #'evil-window-left
+  ;; "C-j"    #'evil-window-down
+  ;; "C-k"    #'evil-window-up
+  ;; "C-l"    #'evil-window-right
+
+  ;; This would screw up escape in the terminal
+  ;; because c-t is equilvalent to escape
+  ;;"C-t"   #'xref-pop-marker-stack
+
+  ;; :n "q"      #'delete-window
+  :n "q"       #'+workspace/close-window-or-workspace
   :n "Q"      #'evil-record-macro
- ;; )
+
+  ;; Text-scaling
+  "M-+"    (λ! (text-scale-set 0))
+  "M-="    #'text-scale-increase
+  "M--"    #'text-scale-decrease
+  ;; )
+   ;; Text Editing
+  ;; :nv "gc" #'evilnc-comment-or-uncomment-lines
+
+ ;; Leader Configs
+  (:leader
+    :desc "Search project"         :n  "g"   #'+default/search-project
+    :desc "Search lines in buffer"         :n  "l"   #'counsel-grep-or-swiper
+    :desc "comment"               :nv "v" #'evilnc-comment-or-uncomment-lines
+
+    (:prefix "o"                      ; toggle
+     :desc "Journal file"            "j" #'org-journal-open-current-journal-file)
+
+    ;;; <leader> q --- quit/session
+    (:prefix-map ("q" . "quit/session")
+      :desc "Restart emacs server"         "d" #'+default/restart-server
+      :desc "Delete frame"                 "f" #'delete-frame
+      :desc "Clear current frame"          "F" #'doom/kill-all-buffers
+      :desc "Kill Emacs (and daemon)"      "K" #'save-buffers-kill-emacs
+      :desc "Quit Emacs"                   "q" #'save-buffers-kill-terminal
+      :desc "Quit Emacs without saving"    "Q" #'evil-quit-all-with-error-code
+      :desc "Quick save current session"   "s" #'doom/quicksave-session
+      :desc "Restore last session"         "l" #'doom/quickload-session
+      :desc "Save session to file"         "S" #'doom/save-session
+      :desc "Restore session from file"    "L" #'doom/load-session
+      :desc "Restart & restore Emacs"      "r" #'doom/restart-and-restore
+      :desc "Restart Emacs"                "R" #'doom/restart)
+
+
+    ;;; <leader> s --- search
+    (:prefix-map ("s" . "search")
+      :desc "Search buffer"                "b" #'swiper
+      :desc "Search current directory"     "d" #'+default/search-cwd
+      :desc "Search other directory"       "D" #'+default/search-other-cwd
+      :desc "Locate file"                  "f" #'locate
+      :desc "Jump to symbol"               "i" #'imenu
+      :desc "Jump to visible link"         "l" #'link-hint-open-link
+      :desc "Jump to link"                 "L" #'ffap-menu
+      :desc "Jump list"                    "j" #'evil-show-jumps
+      :desc "Jump to bookmark"             "m" #'bookmark-jump
+      :desc "Look up online"               "o" #'+lookup/online
+      :desc "Look up online (w/ prompt)"   "O" #'+lookup/online-select
+      :desc "Look up in local docsets"     "k" #'+lookup/in-docsets
+      :desc "Look up in all docsets"       "K" #'+lookup/in-all-docsets
+      :desc "Search project"               "p" #'+default/search-project
+      :desc "Search other project"         "P" #'+default/search-other-project
+      :desc "Jump to mark"                 "r" #'evil-show-marks
+      :desc "Search buffer"                "s" #'swiper-isearch
+      :desc "Search buffer for thing at point" "S" #'swiper-isearch-thing-at-point
+      :desc "Dictionary"                   "t" #'+lookup/dictionary-definition
+      :desc "Thesaurus"                    "T" #'+lookup/synonyms)
+
+
+
+  ;; (:after evil-easymotion
+  ;;   :m "gs" evilem-map
+  ;;   (:map evilem-map
+  ;;   "a" (evilem-create #'evil-forward-arg)
+  ;;   "A" (evilem-create #'evil-backward-arg)
+  ;;   "s" #'evil-avy-goto-char-2
+  ;;   "SPC" (cmd!! #'evil-avy-goto-char-timer t)
+  ;;   "/" #'evil-avy-goto-char-timer))
+  )
 )
  ;; Leader Configs
  ;; (:leader

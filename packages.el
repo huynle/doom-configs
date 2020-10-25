@@ -52,10 +52,13 @@
                    anaconda-mode
                    company-anaconda
                    lsp-python-ms
+                   ;; better-jumper
                    pyimport
-                   rtags)
+                   ;; rtags
+                   )
 
 (package! tmux-pane)
+; (package! exec-path-from-shell)
 (disable-packages! elscreen)
 (package! sr-speedbar)
 ;; (package! evil-tabs)
@@ -66,3 +69,6 @@
 
 (package! imenu-list)
 (disable-packages! counsel-etags)
+(package! flyspell-lazy :pin "3ebf68cc9eb10c972a2de8d7861cbabbbce69570")
+
+;; (package! evil-snipe :disable t)
