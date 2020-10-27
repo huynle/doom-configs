@@ -245,17 +245,22 @@ here everything for org should be in ~~/docs/org~ folder
 #+BEGIN_SRC emacs-lisp
 (use-package! org
   :config
-  (setq org-directory (expand-file-name "~/docs/org")
-        org-agenda-files (file-expand-wildcards "~/docs/org")
-        ;; org-agenda-files (directory-files-recursively "~/docs/org/" "\\.org$")
-        org-default-notes-file (expand-file-name "~/docs/org/scratchpad.org")
-        org-cycle-separator-lines 1
-        org-enforce-todo-dependencies t
-        org-startup-folded t
-        org-imenu-depth 4
-        ;; org-cycle-separator-lines -2
-        org-archive-location (concat org-directory "/archive/%s::datetree/")
-        )
+  (setq
+   org-directory "~/docs/org"
+   ;; org-directory (expand-file-name "~/docs/org")
+   ;; org-agenda-files (file-expand-wildcards "~/docs/org")
+   ;; org-agenda-files (directory-files-recursively "~/docs/org/" "\\.org$")
+
+   ;; do the regular expression
+
+   org-default-notes-file (expand-file-name "~/docs/org/scratchpad.org")
+   org-cycle-separator-lines 1
+   org-enforce-todo-dependencies t
+   org-startup-folded t
+   org-imenu-depth 4
+   ;; org-cycle-separator-lines -2
+   org-archive-location (concat org-directory "/archive/%s::datetree/")
+   )
   (defvar +org-dir (expand-file-name "~/docs/org"))
 
   )
@@ -475,92 +480,18 @@ make sure that imagemagick is enabled
 #+end_src
 
 Currently ~display-pixel-width~ is not an actual variable
-*** Org-Journal
-:PROPERTIES:
-:ID:       ec33acb0-1469-4970-8953-1cf33a78f6bb
-:END:
-
-share the same fold as org-roam!! - [[https://org-roam.readthedocs.io/en/master/ecosystem/][lookie here]]
-for filtering out tags and properties - [[https://orgmode.org/manual/Matching-tags-and-properties.html][look at the manual]]
-
-#+BEGIN_SRC emacs-lisp
-(after! org-journal
-    (setq org-journal-dir (expand-file-name "~/docs/org/journal")
-            ;; org-journal-date-prefix "#+TITLE: "
-            org-journal-file-format "%Y-%m-%d.org"
-            ;; org-journal-date-format "%A, %d %B %Y"
-            org-journal-date-format "%A, %m/%d/%y"
-            org-journal-enable-agenda-integration t
-            ;; org-journal-carryover-items "/!+WAITING|+NEXT"
-            org-journal-carryover-items "/!-DONE|-CANCELLED"
-            org-journal-file-type 'weekly
-            )
-
-    (map! (:map org-journal-mode-map
-            :n "]f"  #'org-journal-open-next-entry
-            :n "[f"  #'org-journal-open-previous-entry
-            :n "C-n" #'org-journal-open-next-entry
-            :n "C-p" #'org-journal-open-previous-entry)
-            (:map org-journal-search-mode-map
-            "C-n" #'org-journal-search-next
-            "C-p" #'org-journal-search-previous)
-            :localleader
-            (:map org-journal-mode-map
-                "c" #'org-journal-new-entry
-                ;; "d" #'org-journal-new-date-entry
-                "n" #'org-add-note
-                ;; "n" #'org-journal-open-next-entry
-                ;; "p" #'org-journal-open-previous-entry
-                ;; (:prefix ("d" . "date/deadline")
-                ;; "d" #'org-agenda-deadline
-                ;; "s" #'org-agenda-schedule)
-                ;; (:prefix "s"
-                ;; "s" #'org-journal-search
-                ;; "f" #'org-journal-search-forever
-                ;; "F" #'org-journal-search-future
-                ;; "w" #'org-journal-search-calendar-week
-                ;; "m" #'org-journal-search-calendar-month
-                ;; "y" #'org-journal-search-calendar-year)
-            )
-
-            (:map org-journal-search-mode-map
-            "n" #'org-journal-search-next
-            "p" #'org-journal-search-prev))
-
-)
-#+END_SRC
-
-
-
-*** Org-roam
-
-#+BEGIN_SRC emacs-lisp
-(after! org-roam
-  (setq org-roam-directory (expand-file-name "~/docs/org/roam")
-        org-roam-index-file "index.org"
-))
-#+END_SRC
-
-using deft to navigate org-roam file
-[[https://www.ianjones.us/2020-05-05-doom-emacs#orga972198][check it here for more info]]
-
-#+BEGIN_SRC emacs-lisp
-(use-package deft
-      :after org
-      :bind
-      ("C-c n d" . deft)
-      :custom
-      (deft-recursive t)
-      (deft-use-filter-string-for-filename t)
-      (deft-default-extension "org")
-      (deft-directory (expand-file-name "~/docs/org/roam")
-))
-#+END_SRC
 *** Org-Agenda
 all of this is from [[https://blog.aaronbieber.com/2016/09/25/agenda-interactions-primer.html][The Chonicle]]
 
 
 #+begin_src emacs-lisp
+
+(after! org
+  (setq
+   org-agenda-file-regexp "\\`\\\([^.].*\\.org\\\|[0-9]\\\{8\\\}\\\(\\.gpg\\\)?\\\)\\'"
+   org-agenda-files '("~/docs/org/")
+   )
+
   (map! :after org-agenda
         :map org-agenda-mode-map
         :m "C-SPC" #'org-agenda-show-and-scroll-up
@@ -580,6 +511,7 @@ all of this is from [[https://blog.aaronbieber.com/2016/09/25/agenda-interaction
         "r" #'org-agenda-refile
         "t" #'org-agenda-todo
         )
+  )
 #+end_src
 
 #+BEGIN_SRC emacs-lisp
@@ -605,6 +537,9 @@ PRIORITY may be one of the characters ?A, ?B, or ?C."
 #+END_SRC
 
 **** Setting up Custom Agendas
+:PROPERTIES:
+:ID:       cb8ef58b-7577-42f0-8665-e90686cd5465
+:END:
 + setting up custom agendas, for Work and for Home
   - note the custom filters =my/org-agenda-skip-function-without-match=
     this allows us to filter out by tags for todos at home
@@ -638,30 +573,11 @@ skip exactly those headlines that do not match."
       (if (my/org-match-at-point-p match) nil next-headline))))
 #+end_src
 
-
-[[https://emacs.stackexchange.com/questions/18179/org-agenda-command-with-org-agenda-filter-by-tag-not-working][org mode - Org: Agenda command with org-agenda-filter-by-tag not working - Em...]]
++ Look here for tag filtering - [[https://orgmode.org/manual/Matching-tags-and-properties.html#Matching-tags-and-properties][Matching tags and properties (The Org Manual)]]
++ [[https://emacs.stackexchange.com/questions/18179/org-agenda-command-with-org-agenda-filter-by-tag-not-working][org mode - Org: Agenda command with org-agenda-filter-by-tag not working - Em...]]
 
 #+BEGIN_SRC emacs-lisp
 (after! org
-  ;; (setq org-agenda-custom-commands
-  ;;     '(("%" "Appointments" agenda* "Today's appointments"
-  ;;  ((org-agenda-span 1)
-  ;;         (org-agenda-max-entries 3)))))
-
-  ;; (setq org-agenda-custom-commands
-  ;;     '(("c" "Simple agenda view"
-  ;;        ((tags "PRIORITY=\"A\""
-  ;;               ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-  ;;                (org-agenda-overriding-header "High-priority unfinished tasks:")))
-  ;;         (agenda "")
-  ;;         (alltodo ""
-  ;;                  ((org-agenda-skip-function
-  ;;                    '(or (air-org-skip-subtree-if-priority ?A)
-  ;;                         (org-agenda-skip-if nil '(scheduled deadline))))))))))
-
-
-
-
   (setq
    org-agenda-skip-scheduled-if-deadline-is-shown t
    org-agenda-custom-commands
@@ -699,6 +615,20 @@ skip exactly those headlines that do not match."
                     (quote ((agenda time-up priority-down tag-up))))
                    (org-deadline-warning-days 0)))
 
+
+       ;; for home AND projects
+       (tags "@home+computer/TODO")
+       (tags "@home+garage/TODO")
+
+       ;; JUST for @home tags
+       (tags "@home/TODO")
+
+       ;; for home OR project
+       ;;(tags "@home|woodworking/TODO")
+
+       ;; (tags-todo "REFILE")
+
+       ;; GET A LIST OF ALL TODOS
        (alltodo ""
                 ((org-agenda-skip-function '(or (air-org-skip-subtree-if-habit)
                                                 (air-org-skip-subtree-if-priority ?A)
@@ -707,7 +637,14 @@ skip exactly those headlines that do not match."
                                                 ))
                  (org-agenda-overriding-header "ALL normal priority tasks AT HOME:")))
        )
-      ))
+      )
+     ("m" "Daily habits"
+         ((agenda ""))
+         ((org-agenda-show-log t)
+          (org-agenda-ndays 7)
+          (org-agenda-log-mode-items '(state))
+          (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":DAILY:"))))
+     )
    )
 
   )
@@ -732,8 +669,8 @@ RIGHT NOW IT IS DEFAULT TO HOME AGENDA
 Moving around with the difference custom agenda
 - still need a little bit of work to get this right
 #+BEGIN_SRC emacs-lisp
-(define-key org-agenda-mode-map "j" 'org-agenda-next-item)
-(define-key org-agenda-mode-map "k" 'org-agenda-previous-item)
+;; (define-key org-agenda-mode-map "j" 'org-agenda-next-item)
+;; (define-key org-agenda-mode-map "k" 'org-agenda-previous-item)
 
 (defun air-org-agenda-next-header ()
   ;; Jump to the next header in an agenda series."
@@ -765,8 +702,8 @@ Moving around with the difference custom agenda
     (if pos (goto-char pos))
     (if backwards (goto-char (line-beginning-position)))))
 
-(define-key org-agenda-mode-map "J" 'air-org-agenda-next-header)
-(define-key org-agenda-mode-map "K" 'air-org-agenda-previous-header)
+;; (define-key org-agenda-mode-map "J" 'air-org-agenda-next-header)
+;; (define-key org-agenda-mode-map "K" 'air-org-agenda-previous-header)
 
 
 (defun air-org-agenda-capture (&optional vanilla)
@@ -777,9 +714,102 @@ Moving around with the difference custom agenda
     (let ((org-overriding-default-time (org-get-cursor-date)))
       (org-capture nil "a"))))
 
-(define-key org-agenda-mode-map "c" 'air-org-agenda-capture)
+;; (define-key org-agenda-mode-map "c" 'air-org-agenda-capture)
 
 
+#+END_SRC
+*** Org-habit
+#+begin_src emacs-lisp
+
+(after! org
+  (require 'org-habit)
+  )
+#+end_src
+
+
+*** Org-Journal
+:PROPERTIES:
+:ID:       ec33acb0-1469-4970-8953-1cf33a78f6bb
+:END:
+
+share the same fold as org-roam!! - [[https://org-roam.readthedocs.io/en/master/ecosystem/][lookie here]]
+for filtering out tags and properties - [[https://orgmode.org/manual/Matching-tags-and-properties.html][look at the manual]]
+
+#+BEGIN_SRC emacs-lisp
+(after! org-journal
+  (setq
+   ;; org-journal-dir (expand-file-name "~/docs/org/journal")
+   org-journal-dir "~/docs/org/journal/"
+   ;; org-journal-date-prefix "#+TITLE: "
+   org-journal-file-format "%Y-%m-%d.org"
+   ;; org-journal-date-format "%A, %d %B %Y"
+   org-journal-date-format "%A, %m/%d/%y"
+   org-journal-enable-agenda-integration t
+   ;; org-journal-carryover-items "/!+WAITING|+NEXT"
+   org-journal-carryover-items "/!-DONE|-CANCELLED"
+   org-journal-file-type 'weekly
+   )
+
+  (add-to-list 'org-agenda-files org-journal-dir)
+
+  (map! (:map org-journal-mode-map
+         :n "]f"  #'org-journal-open-next-entry
+         :n "[f"  #'org-journal-open-previous-entry
+         :n "C-n" #'org-journal-open-next-entry
+         :n "C-p" #'org-journal-open-previous-entry)
+        (:map org-journal-search-mode-map
+         "C-n" #'org-journal-search-next
+         "C-p" #'org-journal-search-previous)
+        :localleader
+        (:map org-journal-mode-map
+         "c" #'org-journal-new-entry
+         ;; "d" #'org-journal-new-date-entry
+         "n" #'org-add-note
+         ;; "n" #'org-journal-open-next-entry
+         ;; "p" #'org-journal-open-previous-entry
+         ;; (:prefix ("d" . "date/deadline")
+         ;; "d" #'org-agenda-deadline
+         ;; "s" #'org-agenda-schedule)
+         ;; (:prefix "s"
+         ;; "s" #'org-journal-search
+         ;; "f" #'org-journal-search-forever
+         ;; "F" #'org-journal-search-future
+         ;; "w" #'org-journal-search-calendar-week
+         ;; "m" #'org-journal-search-calendar-month
+         ;; "y" #'org-journal-search-calendar-year)
+         )
+
+        (:map org-journal-search-mode-map
+         "n" #'org-journal-search-next
+         "p" #'org-journal-search-prev))
+
+  )
+#+END_SRC
+
+
+*** Org-roam
+
+#+BEGIN_SRC emacs-lisp
+(after! org-roam
+  (setq org-roam-directory (expand-file-name "~/docs/org/roam")
+        org-roam-index-file "index.org"
+))
+#+END_SRC
+
+using deft to navigate org-roam file
+[[https://www.ianjones.us/2020-05-05-doom-emacs#orga972198][check it here for more info]]
+
+#+BEGIN_SRC emacs-lisp
+(use-package deft
+      :after org
+      :bind
+      ("C-c n d" . deft)
+      :custom
+      (deft-recursive t)
+      (deft-use-filter-string-for-filename t)
+      (deft-default-extension "org")
+      (deft-directory (expand-file-name "~/docs/org/roam")
+))
 #+END_SRC
 ** Tmux-pane
 

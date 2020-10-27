@@ -49,7 +49,8 @@
   (:leader
     :desc "Search project"         :n  "g"   #'+default/search-project
     :desc "Search lines in buffer"         :n  "l"   #'counsel-grep-or-swiper
-    :desc "comment"               :nv "v" #'evilnc-comment-or-uncomment-lines
+    ;; :desc "comment"               :nv "v" #'evilnc-comment-or-uncomment-lines
+    :desc "comment"               :nv "v" #'comment-dwim
 
     (:prefix "o"                      ; toggle
      :desc "Journal file"            "j" #'org-journal-open-current-journal-file)
