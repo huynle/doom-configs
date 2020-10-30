@@ -63,6 +63,12 @@ Here I setup my config for the =doom-emacs= [[doom:core/][core]]
 
 (setq doom-scratch-buffer-major-mode t)                      ; Make scratchpad buffers inherit the major mode of the current buffer
 
+(setq doom-theme 'doom-dracula)
+
+;; (set-face-background 'hl-line nil)
+;; (set-face-foreground 'highlight "darkblue")
+
+
 #+end_src
 
 Setting whitespaces
@@ -246,12 +252,8 @@ here everything for org should be in ~~/docs/org~ folder
 (use-package! org
   :config
   (setq
+   ;; just the directory is enough
    org-directory "~/docs/org"
-   ;; org-directory (expand-file-name "~/docs/org")
-   ;; org-agenda-files (file-expand-wildcards "~/docs/org")
-   ;; org-agenda-files (directory-files-recursively "~/docs/org/" "\\.org$")
-
-   ;; do the regular expression
 
    org-default-notes-file (expand-file-name "~/docs/org/scratchpad.org")
    org-cycle-separator-lines 1
@@ -260,6 +262,7 @@ here everything for org should be in ~~/docs/org~ folder
    org-imenu-depth 4
    ;; org-cycle-separator-lines -2
    org-archive-location (concat org-directory "/archive/%s::datetree/")
+   org-use-property-inheritance t              ; it's convenient to have properties inherited
    )
   (defvar +org-dir (expand-file-name "~/docs/org"))
 
@@ -286,21 +289,24 @@ To access all these different todos use
 (after! org
   (setq org-todo-keywords
         '((sequence
-           "STARTED(s!)"
-           "TODO(t)"  ; next action
+           "TODO(t)"  ; FIRST action
+           "STARTED(s!)" ;
            "NEXT(n)"  ; next action
            "IN-PROGRESS(p)"  ; next action
            "WAITING(w@/!)" "|" "DONE(x!)" "CANCELLED(c)")
-         (sequence "LEARN" "TRY" "TEACH" "|" "COMPLETE(x)")
-         (sequence "IDEA" "TRY" "|" "COMPLETE(x)")
-         (sequence "DRAFT(d!)" "|" "DONE(x!)"))
+          (sequence "LEARN" "TRY" "TEACH" "|" "COMPLETE(x)")
+          (sequence "IDEA" "TRY" "|" "COMPLETE(x)")
+          (sequence "DRAFT(d!)" "|" "DONE(x!)"))
 
-         org-todo-keyword-faces
-         '(("TODO" . (:foreground "green" :weight bold))
-           ("DONE" . (:foreground "cyan" :weight bold))
-           ("WAITING" . (:foreground "red" :weight bold))
-           ("IN-PROGRESS" . (:foreground "yellow" :weight bold)))
-))
+        org-todo-keyword-faces
+        '(("TODO" . (:foreground "green" :weight bold))
+          ("STARTED" . (:foreground "magenta" :weight bold))
+          ("NEXT" . (:foreground "blue" :weight bold))
+          ("IN-PROGRESS" . (:foreground "yellow" :weight bold))
+          ("DONE" . (:foreground "cyan" :weight bold))
+          ("WAITING" . (:foreground "red" :weight bold))
+          )
+        ))
 
 #+end_src
 *** Org-id
@@ -483,14 +489,30 @@ Currently ~display-pixel-width~ is not an actual variable
 *** Org-Agenda
 all of this is from [[https://blog.aaronbieber.com/2016/09/25/agenda-interactions-primer.html][The Chonicle]]
 
+#+begin_src emacs-lisp
+(use-package! org-super-agenda
+  :commands (org-super-agenda-mode)
+  )
+#+end_src
 
 #+begin_src emacs-lisp
 
-(after! org
+(after! org-agenda
+  ;; enabling it
+  (org-super-agenda-mode)
+
+
   (setq
+   ;; regex to filter out the files specifically for agenda
    org-agenda-file-regexp "\\`\\\([^.].*\\.org\\\|[0-9]\\\{8\\\}\\\(\\.gpg\\\)?\\\)\\'"
    org-agenda-files '("~/docs/org/")
+   org-agenda-skip-scheduled-if-done t
+   org-agenda-skip-deadline-if-done t
+   org-agenda-include-deadlines t
+   ;; org-agenda-block-separator nil
+   ;; org-agenda-compact-blocks t
    )
+
 
   (map! :after org-agenda
         :map org-agenda-mode-map
@@ -577,7 +599,7 @@ skip exactly those headlines that do not match."
 + [[https://emacs.stackexchange.com/questions/18179/org-agenda-command-with-org-agenda-filter-by-tag-not-working][org mode - Org: Agenda command with org-agenda-filter-by-tag not working - Em...]]
 
 #+BEGIN_SRC emacs-lisp
-(after! org
+(after! org-agenda
   (setq
    org-agenda-skip-scheduled-if-deadline-is-shown t
    org-agenda-custom-commands
@@ -604,9 +626,6 @@ skip exactly those headlines that do not match."
       ((org-agenda-compact-blocks t)))
      ("h" "thing TODO at Home"
       (
-       (tags "PRIORITY=\"A\""
-             ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-              (org-agenda-overriding-header "High-priority unfinished tasks:")))
 
        (agenda "" ((org-agenda-ndays 1)
                    (org-agenda-skip-function
@@ -615,6 +634,13 @@ skip exactly those headlines that do not match."
                     (quote ((agenda time-up priority-down tag-up))))
                    (org-deadline-warning-days 0)))
 
+       (tags "PRIORITY=\"A\""
+             ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+              (org-agenda-skip-function
+               '(my/org-agenda-skip-without-match "-@work"))
+              (org-agenda-overriding-header "High-priority unfinished tasks:")
+              )
+             )
 
        ;; for home AND projects
        (tags "@home+computer/TODO")
@@ -638,12 +664,101 @@ skip exactly those headlines that do not match."
                  (org-agenda-overriding-header "ALL normal priority tasks AT HOME:")))
        )
       )
-     ("m" "Daily habits"
-         ((agenda ""))
-         ((org-agenda-show-log t)
-          (org-agenda-ndays 7)
-          (org-agenda-log-mode-items '(state))
-          (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":DAILY:"))))
+
+     ("t" "Temp Test"
+      ((agenda "" ((org-agenda-span 'day)
+                   (org-super-agenda-groups
+                    '((:name "Today"
+                       :time-grid t
+                       :date today
+                       :todo "TODAY"
+                       :scheduled today
+                       :order 1)))))
+       (alltodo "" ((org-agenda-overriding-header "")
+                    (org-super-agenda-groups
+                     '((:name "Next to do"
+                        :todo "NEXT"
+                        :order 1
+                        )
+                       (:name "Important"
+                        :tag "Important"
+                        :priority "A"
+                        :order 6)
+                       (:name "Due Today"
+                        :deadline today
+                        :order 2)
+                       (:name "Due Soon"
+                        :deadline future
+                        :order 8)
+                       (:name "Overdue"
+                        :deadline past
+                        :face error
+                        :order 7)
+                       (:name "Trivial"
+                        :priority<= "E"
+                        :tag ("Trivial" "Unimportant")
+                        :todo ("SOMEDAY" )
+                        :order 90)
+                       (:discard (:tag ("@work" "Chore" "Routine" "Daily")))))))))
+
+     ("o" "Overview"
+      ((agenda "" ((org-agenda-span 'day)
+                   (org-super-agenda-groups
+                    '((:name "Today"
+                       :time-grid t
+                       :date today
+                       :todo "TODAY"
+                       :scheduled today
+                       :order 1)))))
+       (alltodo "" ((org-agenda-overriding-header "")
+                    (org-super-agenda-groups
+                     '((:name "Next to do"
+                        :todo "NEXT"
+                        :order 1)
+                       (:name "Important"
+                        :tag "Important"
+                        :priority "A"
+                        :order 6)
+                       (:name "Due Today"
+                        :deadline today
+                        :order 2)
+                       (:name "Due Soon"
+                        :deadline future
+                        :order 8)
+                       (:name "Overdue"
+                        :deadline past
+                        :face error
+                        :order 7)
+                       (:name "Assignments"
+                        :tag "Assignment"
+                        :order 10)
+                       (:name "Issues"
+                        :tag "Issue"
+                        :order 12)
+                       (:name "Emacs"
+                        :tag "Emacs"
+                        :order 13)
+                       (:name "Projects"
+                        :tag "Project"
+                        :order 14)
+                       (:name "Research"
+                        :tag "Research"
+                        :order 15)
+                       (:name "To read"
+                        :tag "Read"
+                        :order 30)
+                       (:name "Waiting"
+                        :todo "WAITING"
+                        :order 20)
+                       (:name "University"
+                        :tag "uni"
+                        :order 32)
+                       (:name "Trivial"
+                        :priority<= "E"
+                        :tag ("Trivial" "Unimportant")
+                        :todo ("SOMEDAY" )
+                        :order 90)
+                       (:discard (:tag ("Chore" "Routine" "Daily")))))))))
      )
    )
 
@@ -663,14 +778,17 @@ RIGHT NOW IT IS DEFAULT TO HOME AGENDA
     (delete-other-windows)))
 
 (define-key evil-normal-state-map (kbd "M-SPC") 'air-pop-to-org-agenda)
+;; (define-key org-agenda-mode-map "j" 'org-agenda-next-item)
+;; (define-key org-agenda-mode-map "k" 'org-agenda-previous-item)
+;; (define-key org-agenda-mode-map "J" 'air-org-agenda-next-header)
+;; (define-key org-agenda-mode-map "K" 'air-org-agenda-previous-header)
+
 #+end_src
 
 
 Moving around with the difference custom agenda
 - still need a little bit of work to get this right
 #+BEGIN_SRC emacs-lisp
-;; (define-key org-agenda-mode-map "j" 'org-agenda-next-item)
-;; (define-key org-agenda-mode-map "k" 'org-agenda-previous-item)
 
 (defun air-org-agenda-next-header ()
   ;; Jump to the next header in an agenda series."
@@ -702,8 +820,6 @@ Moving around with the difference custom agenda
     (if pos (goto-char pos))
     (if backwards (goto-char (line-beginning-position)))))
 
-;; (define-key org-agenda-mode-map "J" 'air-org-agenda-next-header)
-;; (define-key org-agenda-mode-map "K" 'air-org-agenda-previous-header)
 
 
 (defun air-org-agenda-capture (&optional vanilla)
@@ -723,6 +839,13 @@ Moving around with the difference custom agenda
 
 (after! org
   (require 'org-habit)
+  (setq
+   org-habit-following-days 7
+   org-habit-preceding-days 35
+   org-habit-show-habits t
+   org-habit-show-all-today t
+   org-habit-show-done-always-green t
+   )
   )
 #+end_src
 
